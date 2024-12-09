@@ -10,10 +10,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.neoflex.mscalculator.dtos.CreditDto;
-import ru.neoflex.mscalculator.dtos.LoanOfferDto;
-import ru.neoflex.mscalculator.dtos.LoanStatementRequestDto;
-import ru.neoflex.mscalculator.dtos.ScoringDataDto;
+import ru.neoflex.mscalculator.dto.CreditDto;
+import ru.neoflex.mscalculator.dto.LoanOfferDto;
+import ru.neoflex.mscalculator.dto.LoanStatementRequestDto;
+import ru.neoflex.mscalculator.dto.ScoringDataDto;
 import ru.neoflex.mscalculator.exception.CreditDeniedException;
 import ru.neoflex.mscalculator.service.CalculatorService;
 
