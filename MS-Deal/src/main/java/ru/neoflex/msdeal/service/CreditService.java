@@ -1,14 +1,12 @@
 package ru.neoflex.msdeal.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.neoflex.msdeal.dto.CreditDto;
 import ru.neoflex.msdeal.dto.enumeration.CreditStatus;
 import ru.neoflex.msdeal.model.CreditEntity;
 import ru.neoflex.msdeal.repository.CreditRepository;
-
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -18,10 +16,6 @@ public class CreditService {
 
     public CreditService(CreditRepository creditRepository) {
         this.creditRepository = creditRepository;
-    }
-
-    public CreditEntity findById(UUID creditId) throws EntityNotFoundException {
-        return creditRepository.findById(creditId).orElseThrow(EntityNotFoundException::new);
     }
 
     public CreditEntity saveCredit(CreditDto creditDto) {

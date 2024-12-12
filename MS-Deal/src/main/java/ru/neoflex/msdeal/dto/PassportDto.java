@@ -24,7 +24,7 @@ public class PassportDto {
     @Schema(description = "Номер паспорта", example = "123456")
     private String number;
 
-    @Schema(description = "Подразделение, выдавшее паспорт", example = "МВД Такой-то области")
+    @Schema(description = "Подразделение, выдавшее паспорт", example = "ГУ МВД РОССИИ ПО МОСКОВСКОЙ ОБЛАСТИ")
     private String issueBranch;
 
     @Schema(description = "Дата выдачи паспорта", example = "2014-07-07")

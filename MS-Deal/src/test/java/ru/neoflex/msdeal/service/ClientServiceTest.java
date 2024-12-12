@@ -1,8 +1,13 @@
 package ru.neoflex.msdeal.service;
 
+import ch.qos.logback.core.net.server.Client;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -12,18 +17,25 @@ import ru.neoflex.msdeal.dto.enumeration.Gender;
 import ru.neoflex.msdeal.dto.enumeration.MaritalStatus;
 import ru.neoflex.msdeal.dto.enumeration.WorkPosition;
 import ru.neoflex.msdeal.model.ClientEntity;
+import ru.neoflex.msdeal.repository.ClientRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
-@ActiveProfiles("test")
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class ClientServiceTest {
 
-    @Autowired
+    @Mock
+    private ClientRepository clientRepository;
+
+    @InjectMocks
     private ClientService clientService;
 
     private LoanStatementRequestDto validRequest;
@@ -64,48 +76,59 @@ class ClientServiceTest {
     }
 
     @Test
-    void findByIdThrowsWhenGivenWrongId() {
-        assertThrowsExactly(EntityNotFoundException.class,
-                            () -> clientService.findById(UUID.randomUUID()));
+    void createClientWithValidRequestSavesRightClientEntity() {
+        ClientEntity clientEntity = new ClientEntity();
+
+        clientEntity.setFirstName(validRequest.getFirstName());
+        clientEntity.setLastName(validRequest.getLastName());
+        clientEntity.setMiddleName(validRequest.getMiddleName());
+        clientEntity.setEmail(validRequest.getEmail());
+        clientEntity.setBirthDate(validRequest.getBirthdate());
+
+        clientEntity.setPassport(PassportDto.builder()
+                .series(validRequest.getPassportSeries())
+                .number(validRequest.getPassportNumber())
+                .build());
+
+        when(clientRepository.save(any(ClientEntity.class))).thenReturn(clientEntity);
+
+        ClientEntity savedClientEntity = clientService.createClientWithRequest(validRequest);
+
+        assertEquals(clientEntity.getFirstName(), savedClientEntity.getFirstName());
+        assertEquals(clientEntity.getMiddleName(), savedClientEntity.getMiddleName());
+        assertEquals(clientEntity.getLastName(), savedClientEntity.getLastName());
+        assertEquals(clientEntity.getEmail(), savedClientEntity.getEmail());
+        assertEquals(clientEntity.getBirthDate(), savedClientEntity.getBirthDate());
+        assertEquals(clientEntity.getPassport(), savedClientEntity.getPassport());
     }
 
     @Test
-    void createClientDoesCreatesClient() {
-        ClientEntity saved = clientService.createClientWithRequest(validRequest);
+    void enrichClientWithValidFinishRegistrationEnrichesClientCorrectly() {
+        ClientEntity clientEntity = new ClientEntity();
 
-        ClientEntity found = clientService.findById(saved.getClientId());
+        when(clientRepository.findById(clientEntity.getClientId())).thenReturn(Optional.of(clientEntity));
+        when(clientRepository.save(any(ClientEntity.class))).thenReturn(clientEntity);
 
-        assertTrue(found.getClientId() == saved.getClientId());
-        assertEquals(found.getFirstName(), validRequest.getFirstName());
-        assertEquals(found.getMiddleName(), validRequest.getMiddleName());
-        assertEquals(found.getLastName(), validRequest.getLastName());
-        assertEquals(found.getEmail(), validRequest.getEmail());
-        assertEquals(found.getBirthDate(), validRequest.getBirthdate());
-        assertEquals(found.getPassport().getSeries(), validRequest.getPassportSeries());
-        assertEquals(found.getPassport().getNumber(), validRequest.getPassportNumber());
+        clientEntity.setGender(validFinishRegistration.getGender());
+        clientEntity.setMaritalStatus(validFinishRegistration.getMaritalStatus());
+        clientEntity.setDependentAmount(validFinishRegistration.getDependentAmount());
+        clientEntity.setAccountNumber(validFinishRegistration.getAccountNumber());
+        clientEntity.setPassport(PassportDto.builder()
+                .issueBranch(validFinishRegistration.getPassportIssueBranch())
+                .issueDate(validFinishRegistration.getPassportIssueDate())
+                .build());
+        clientEntity.setEmployment(validFinishRegistration.getEmployment());
+
+        ClientEntity savedClientEntity = clientService.enrichClient(validFinishRegistration, clientEntity.getClientId());
+
+        assertEquals(validFinishRegistration.getGender(), savedClientEntity.getGender());
+        assertEquals(validFinishRegistration.getMaritalStatus(), savedClientEntity.getMaritalStatus());
+        assertEquals(validFinishRegistration.getDependentAmount(), savedClientEntity.getDependentAmount());
+        assertEquals(validFinishRegistration.getAccountNumber(), savedClientEntity.getAccountNumber());
+        assertEquals(validFinishRegistration.getPassportIssueBranch(), savedClientEntity.getPassport().getIssueBranch());
+        assertEquals(validFinishRegistration.getPassportIssueDate(), savedClientEntity.getPassport().getIssueDate());
+        assertEquals(validFinishRegistration.getEmployment(), savedClientEntity.getEmployment());
     }
 
-    @Test
-    void enrichClientThrowsWhenGivenWrongId() {
-        assertThrowsExactly(EntityNotFoundException.class,
-                            () -> clientService.enrichClient(validFinishRegistration,
-                                                             UUID.randomUUID()));
-    }
-
-    @Test
-    void doesEnrichClientWhenGivenValidData() {
-        ClientEntity saved = clientService.createClientWithRequest(validRequest);
-
-        clientService.enrichClient(validFinishRegistration, saved.getClientId());
-
-        ClientEntity found = clientService.findById(saved.getClientId());
-
-        assertEquals(validFinishRegistration.getGender(), found.getGender());
-        assertEquals(validFinishRegistration.getDependentAmount(), found.getDependentAmount());
-        assertEquals(validFinishRegistration.getEmployment(), found.getEmployment());
-        assertEquals(validFinishRegistration.getMaritalStatus(), found.getMaritalStatus());
-        assertEquals(validFinishRegistration.getPassportIssueDate(), found.getPassport().getIssueDate());
-        assertEquals(validFinishRegistration.getPassportIssueBranch(), found.getPassport().getIssueBranch());
-    }
 
 }

@@ -29,18 +29,18 @@ public class ScoringDataDto {
 
     @NotNull
     @Size(min = 2, max = 30)
-    @Pattern(regexp = "^[a-zA-Z]+$")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯЁё]+$")
     @Schema(description = "Имя клиента", example = "Джон")
     private String firstName;
 
     @NotNull
     @Size(min = 2, max = 30)
-    @Pattern(regexp = "^[a-zA-Z]+$")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯЁё]+$")
     @Schema(description = "Фамилия клиента", example = "Доу")
     private String lastName;
 
     @Size(min = 2, max = 30)
-    @Pattern(regexp = "^[a-zA-Z]+$")
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯЁё]+$")
     @Schema(description = "Отчество клиента (при наличии)", example = "Джонсович")
     private String middleName;
 
@@ -81,7 +81,7 @@ public class ScoringDataDto {
 
     @NotNull
     @Valid
-    @Schema(description = "Данные о занятости клиента", example = "SELF_EMPLOYED")
+    @Schema(description = "Данные о занятости клиента")
     private EmploymentDto employment;
 
     @NotNull

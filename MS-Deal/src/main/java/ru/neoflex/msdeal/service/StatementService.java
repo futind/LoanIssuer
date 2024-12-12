@@ -3,6 +3,7 @@ package ru.neoflex.msdeal.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.neoflex.msdeal.dto.FinishRegistrationRequestDto;
 import ru.neoflex.msdeal.dto.LoanOfferDto;
 import ru.neoflex.msdeal.dto.ScoringDataDto;
@@ -12,12 +13,10 @@ import ru.neoflex.msdeal.dto.enumeration.ChangeType;
 import ru.neoflex.msdeal.model.ClientEntity;
 import ru.neoflex.msdeal.model.CreditEntity;
 import ru.neoflex.msdeal.model.StatementEntity;
-import ru.neoflex.msdeal.repository.ClientRepository;
 import ru.neoflex.msdeal.repository.StatementRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -33,7 +32,8 @@ public class StatementService {
         return statementRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
-    public StatementEntity createStatementWithRequest(ClientEntity clientEntity) {
+    @Transactional
+    public StatementEntity createStatementWithClient(ClientEntity clientEntity) {
         StatementEntity statementEntity = new StatementEntity();
 
         statementEntity.setClient(clientEntity);
@@ -46,6 +46,7 @@ public class StatementService {
         return statementRepository.save(statementEntity);
     }
 
+    @Transactional
     public void changeStatementStatus(StatementEntity statementEntity, ApplicationStatus status) {
 
         ApplicationStatus oldStatus = statementEntity.getStatus();
@@ -64,12 +65,12 @@ public class StatementService {
         log.info("Changed statement status from {} to {}. Saved the statement.", oldStatus, status);
     }
 
+    @Transactional
     public StatementEntity setAppliedOffer(LoanOfferDto offer) throws EntityNotFoundException {
         StatementEntity statementEntity = findById(offer.getStatementId());
 
         statementEntity.setAppliedOffer(offer);
         changeStatementStatus(statementEntity, ApplicationStatus.APPROVED);
-
 
         log.info("Set the applied offer, saving updated statement...");
         return statementRepository.save(statementEntity);
@@ -101,6 +102,7 @@ public class StatementService {
                 .build();
     }
 
+    @Transactional
     public StatementEntity setCredit(UUID statementId, CreditEntity creditEntity)
                                                                         throws EntityNotFoundException {
         StatementEntity statementEntity = findById(statementId);

@@ -3,6 +3,7 @@ package ru.neoflex.msdeal.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.neoflex.msdeal.dto.FinishRegistrationRequestDto;
 import ru.neoflex.msdeal.dto.LoanStatementRequestDto;
 import ru.neoflex.msdeal.dto.PassportDto;
@@ -19,10 +20,6 @@ public class ClientService {
 
     public ClientService(ClientRepository clientRepository) {
         this.clientRepository = clientRepository;
-    }
-
-    public ClientEntity findById(UUID id) {
-        return clientRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     public ClientEntity createClientWithRequest(LoanStatementRequestDto request) {
@@ -46,7 +43,8 @@ public class ClientService {
         return clientRepository.save(clientEntity);
     }
 
-    public void enrichClient(FinishRegistrationRequestDto finishRegistrationRequestDto, UUID clientId)
+    @Transactional
+    public ClientEntity enrichClient(FinishRegistrationRequestDto finishRegistrationRequestDto, UUID clientId)
                                                                        throws EntityNotFoundException {
         ClientEntity clientEntity = clientRepository.findById(clientId)
                                                     .orElseThrow(EntityNotFoundException::new);
@@ -61,10 +59,11 @@ public class ClientService {
 
         clientEntity.setEmployment(finishRegistrationRequestDto.getEmployment());
 
-        clientRepository.save(clientEntity);
+
         log.info("""
                 Enriched client with the information from finishing registration request form. \
-                Updated the client in the database.""");
+                Updating the client in the database...""");
+        return clientRepository.save(clientEntity);
     }
 
 }

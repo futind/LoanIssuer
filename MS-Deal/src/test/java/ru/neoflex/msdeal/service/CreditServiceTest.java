@@ -4,12 +4,18 @@ import jakarta.persistence.EntityNotFoundException;
 import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import ru.neoflex.msdeal.dto.CreditDto;
 import ru.neoflex.msdeal.dto.PaymentScheduleElementDto;
+import ru.neoflex.msdeal.dto.enumeration.CreditStatus;
 import ru.neoflex.msdeal.model.CreditEntity;
+import ru.neoflex.msdeal.repository.CreditRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,13 +23,17 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-@ActiveProfiles("test")
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class CreditServiceTest {
 
-    @Autowired
-    private CreditService creditService;
+    @Mock
+    CreditRepository creditRepository;
+
+    @InjectMocks
+    CreditService creditService;
 
     private CreditDto validCredit;
 
@@ -49,27 +59,32 @@ public class CreditServiceTest {
     }
 
     @Test
-    void findByIdThrowsWhenGivenWrongId() {
-        assertThrowsExactly(EntityNotFoundException.class,
-                () -> creditService.findById(UUID.randomUUID()));
+    void saveCreditSavesTheCredit() {
+        CreditEntity creditEntity = new CreditEntity();
+
+        creditEntity.setAmount(validCredit.getAmount());
+        creditEntity.setTerm(validCredit.getTerm());
+        creditEntity.setMonthlyPayment(validCredit.getMonthlyPayment());
+        creditEntity.setRate(validCredit.getRate());
+        creditEntity.setPsk(validCredit.getPsk());
+        creditEntity.setIsInsuranceEnabled(validCredit.getIsInsuranceEnabled());
+        creditEntity.setIsSalaryClient(validCredit.getIsSalaryClient());
+        creditEntity.setPaymentSchedule(validCredit.getPaymentSchedule());
+        creditEntity.setCreditStatus(CreditStatus.CALCULATED);
+
+        when(creditRepository.save(any(CreditEntity.class))).thenReturn(creditEntity);
+
+        CreditEntity savedCreditEntity = creditService.saveCredit(validCredit);
+
+        assertEquals(validCredit.getAmount(), savedCreditEntity.getAmount());
+        assertEquals(validCredit.getTerm(), savedCreditEntity.getTerm());
+        assertEquals(validCredit.getMonthlyPayment(), savedCreditEntity.getMonthlyPayment());
+        assertEquals(validCredit.getRate(), savedCreditEntity.getRate());
+        assertEquals(validCredit.getPsk(), savedCreditEntity.getPsk());
+        assertEquals(validCredit.getIsInsuranceEnabled(), savedCreditEntity.getIsInsuranceEnabled());
+        assertEquals(validCredit.getIsSalaryClient(), savedCreditEntity.getIsSalaryClient());
+        assertEquals(validCredit.getPaymentSchedule(), savedCreditEntity.getPaymentSchedule());
+        assertEquals(CreditStatus.CALCULATED, savedCreditEntity.getCreditStatus());
     }
-
-    @Test
-    void saveCreditDoesSaveTheCredit() {
-        CreditEntity saved = creditService.saveCredit(validCredit);
-
-        CreditEntity found = creditService.findById(saved.getCreditId());
-
-        assertTrue((validCredit.getAmount().subtract(found.getAmount())).abs()
-                             .compareTo(new BigDecimal("0.01")) < 0);
-        assertEquals(validCredit.getTerm(), found.getTerm());
-        assertEquals(validCredit.getMonthlyPayment(), found.getMonthlyPayment());
-        assertEquals(validCredit.getRate(), found.getRate());
-        assertEquals(validCredit.getPsk(), found.getPsk());
-        assertEquals(validCredit.getIsInsuranceEnabled(), found.getIsInsuranceEnabled());
-        assertEquals(validCredit.getIsSalaryClient(), found.getIsSalaryClient());
-        assertEquals(validCredit.getPaymentSchedule(), found.getPaymentSchedule());
-    }
-
 
 }

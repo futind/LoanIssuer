@@ -38,7 +38,7 @@ public class FinishRegistrationRequestDto {
 
     @NotNull
     @NotBlank
-    @Schema(description = "Подразделение, выдавшее паспорт", example = "МВД по Такой-то области")
+    @Schema(description = "Подразделение, выдавшее паспорт", example = "ГУ МВД РОССИИ ПО МОСКОВСКОЙ ОБЛАСТИ")
     private String passportIssueBranch;
 
     @NotNull
