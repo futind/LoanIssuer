@@ -33,6 +33,3 @@ build/
 
 ### Mac OS ###
 .DS_Store
-
-# Secrets
-MS-Deal/src/main/resources/application-local.properties
