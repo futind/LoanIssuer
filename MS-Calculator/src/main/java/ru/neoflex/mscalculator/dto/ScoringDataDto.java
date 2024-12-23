@@ -80,7 +80,7 @@ public class ScoringDataDto {
 
     @NotNull
     @Valid
-    @Schema(description = "Данные о занятости клиента", example = "SELF_EMPLOYED")
+    @Schema(description = "Данные о занятости клиента")
     private EmploymentDto employment;
 
     @NotNull
