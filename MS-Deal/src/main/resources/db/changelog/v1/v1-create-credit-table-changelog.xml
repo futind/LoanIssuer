@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro
+        http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+        <changeSet id="v1-2" author="Daniil Futin">
+            <preConditions onFail="MARK_RAN">
+                <not>
+                    <tableExists tableName="credit"/>
+                </not>
+            </preConditions>
+            <createTable tableName="credit">
+                <column name="credit_id" type="uuid">
+                    <constraints primaryKey="true"/>
+                </column>
+                <column name="amount" type="decimal(8,2)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="term" type="int">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="monthly_payment" type="decimal(8,2)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="rate" type="decimal(8,2)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="psk" type="decimal(8,2)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="payment_schedule" type="jsonb">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="is_insurance_enabled" type="boolean">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="is_salary_client" type="boolean">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="credit_status" type="varchar(255)">
+                    <constraints nullable="false"/>
+                </column>
+            </createTable>
+        </changeSet>
+
+</databaseChangeLog>
