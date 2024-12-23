@@ -76,7 +76,8 @@ public class StatementService {
         return statementRepository.save(statementEntity);
     }
 
-    public ScoringDataDto enrichScoringData(FinishRegistrationRequestDto finishingRequest, UUID statementId) {
+    public ScoringDataDto enrichScoringData(FinishRegistrationRequestDto finishingRequest, UUID statementId)
+                                                                                throws EntityNotFoundException{
         StatementEntity statementEntity = statementRepository.findById(statementId)
                 .orElseThrow(EntityNotFoundException::new);
 

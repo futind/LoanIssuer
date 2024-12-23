@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro
+        http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+        <changeSet id="v1-1" author="Daniil Futin">
+            <preConditions onFail="MARK_RAN">
+                <not>
+                    <tableExists tableName="client"/>
+                </not>
+            </preConditions>
+            <createTable tableName="client">
+                <column name="client_id" type="uuid">
+                    <constraints primaryKey="true"/>
+                </column>
+                <column name="first_name" type="varchar(30)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="last_name" type="varchar(30)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="middle_name" type="varchar(30)">
+                    <constraints nullable="true"/>
+                </column>
+                <column name="birth_date" type="date">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="email" type="varchar(255)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="gender" type="varchar(255)">
+                    <constraints nullable="true"/>
+                </column>
+                <column name="marital_status" type="varchar(255)">
+                    <constraints nullable="true"/>
+                </column>
+                <column name="dependent_amount" type="int">
+                    <constraints nullable="true"/>
+                </column>
+                <column name="passport" type="jsonb">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="employment" type="jsonb">
+                    <constraints nullable="true"/>
+                </column>
+                <column name="account_number" type="varchar(255)">
+                    <constraints nullable="true"/>
+                </column>
+            </createTable>
+        </changeSet>
+
+</databaseChangeLog>
