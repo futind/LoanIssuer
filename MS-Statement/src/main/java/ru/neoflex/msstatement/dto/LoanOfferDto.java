@@ -24,31 +24,31 @@ public class LoanOfferDto {
 
     @NotNull
     @Min(value = 20000)
-    @Schema(description = "Сумма займа в рублях")
+    @Schema(description = "Сумма займа в рублях", example = "100000")
     private BigDecimal requestedAmount;
 
     @NotNull
-    @Schema(description = "Полная стоимость кредита в рублях")
+    @Schema(description = "Полная стоимость кредита в рублях", example = "120000")
     private BigDecimal totalAmount;
 
     @NotNull
     @Min(value = 6)
-    @Schema(description = "Срок кредита в месяцах")
+    @Schema(description = "Срок кредита в месяцах", example = "6")
     private Integer term;
 
     @NotNull
-    @Schema(description = "Ежемесячный платёж в рублях")
+    @Schema(description = "Ежемесячный платёж в рублях", example = "20000")
     private BigDecimal monthlyPayment;
 
     @NotNull
-    @Schema(description = "Процентная ставка")
+    @Schema(description = "Процентная ставка", example = "20%")
     private BigDecimal rate;
 
     @NotNull
-    @Schema(description = "Застрахован ли кредит")
+    @Schema(description = "Застрахован ли кредит", example = "false")
     private Boolean isInsuranceEnabled;
 
     @NotNull
-    @Schema(description = "Получает ли клиент зарплату в банке")
+    @Schema(description = "Получает ли клиент зарплату в банке", example = "true")
     private Boolean isSalaryClient;
 }
