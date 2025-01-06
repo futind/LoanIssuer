@@ -4,9 +4,9 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.neoflex.msdeal.dto.FinishRegistrationRequestDto;
-import ru.neoflex.msdeal.dto.LoanStatementRequestDto;
-import ru.neoflex.msdeal.dto.PassportDto;
+import ru.neoflex.loanissuerlibrary.dto.FinishRegistrationRequestDto;
+import ru.neoflex.loanissuerlibrary.dto.LoanStatementRequestDto;
+import ru.neoflex.loanissuerlibrary.dto.PassportDto;
 import ru.neoflex.msdeal.model.ClientEntity;
 import ru.neoflex.msdeal.repository.ClientRepository;
 
@@ -65,5 +65,4 @@ public class ClientService {
                 Updating the client in the database...""");
         return clientRepository.save(clientEntity);
     }
-
 }

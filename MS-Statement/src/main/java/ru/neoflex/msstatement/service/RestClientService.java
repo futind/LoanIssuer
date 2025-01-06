@@ -1,15 +1,13 @@
 package ru.neoflex.msstatement.service;
 
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
-import ru.neoflex.msstatement.dto.LoanOfferDto;
-import ru.neoflex.msstatement.dto.LoanStatementRequestDto;
+import ru.neoflex.loanissuerlibrary.dto.LoanOfferDto;
+import ru.neoflex.loanissuerlibrary.dto.LoanStatementRequestDto;
 
 import java.util.List;
 

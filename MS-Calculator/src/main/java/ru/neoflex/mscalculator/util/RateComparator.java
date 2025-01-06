@@ -1,6 +1,6 @@
 package ru.neoflex.mscalculator.util;
 
-import ru.neoflex.mscalculator.dto.LoanOfferDto;
+import ru.neoflex.loanissuerlibrary.dto.LoanOfferDto;
 
 import java.util.Comparator;
 

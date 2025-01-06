@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.neoflex.mscalculator.dto.CreditDto;
-import ru.neoflex.mscalculator.dto.LoanOfferDto;
-import ru.neoflex.mscalculator.dto.LoanStatementRequestDto;
-import ru.neoflex.mscalculator.dto.ScoringDataDto;
-import ru.neoflex.mscalculator.exception.CreditDeniedException;
+import ru.neoflex.loanissuerlibrary.dto.CreditDto;
+import ru.neoflex.loanissuerlibrary.dto.LoanOfferDto;
+import ru.neoflex.loanissuerlibrary.dto.LoanStatementRequestDto;
+import ru.neoflex.loanissuerlibrary.dto.ScoringDataDto;
+import ru.neoflex.loanissuerlibrary.exception.CreditDeniedException;
 
 import java.util.List;
 

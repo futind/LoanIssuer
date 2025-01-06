@@ -1,21 +1,17 @@
 package ru.neoflex.msdeal.service;
 
-import com.fasterxml.classmate.GenericType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
-import ru.neoflex.msdeal.dto.CreditDto;
-import ru.neoflex.msdeal.dto.LoanOfferDto;
-import ru.neoflex.msdeal.dto.LoanStatementRequestDto;
-import ru.neoflex.msdeal.dto.ScoringDataDto;
-import ru.neoflex.msdeal.exception.CreditDeniedException;
+import ru.neoflex.loanissuerlibrary.dto.CreditDto;
+import ru.neoflex.loanissuerlibrary.dto.LoanOfferDto;
+import ru.neoflex.loanissuerlibrary.dto.LoanStatementRequestDto;
+import ru.neoflex.loanissuerlibrary.dto.ScoringDataDto;
+import ru.neoflex.loanissuerlibrary.exception.CreditDeniedException;
 
 import java.util.List;
 import java.util.Map;

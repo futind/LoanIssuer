@@ -36,3 +36,5 @@ build/
 
 # Secrets
 MS-Deal/src/main/resources/application-local.properties
+MS-Dossier/src/main/resources/application-local.properties
+Documents/

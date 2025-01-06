@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "msdossier.documents.path",
+      "type": "java.lang.String",
+      "description": "Path to the folder in which documents are stored."
+    }
+  ]
+}

@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientResponseException;
-import ru.neoflex.msstatement.dto.LoanOfferDto;
-import ru.neoflex.msstatement.dto.LoanStatementRequestDto;
-import ru.neoflex.msstatement.exception.PrescoringFailedException;
+import ru.neoflex.loanissuerlibrary.dto.LoanOfferDto;
+import ru.neoflex.loanissuerlibrary.dto.LoanStatementRequestDto;
+import ru.neoflex.loanissuerlibrary.exception.PrescoringFailedException;
 
 import java.util.List;
 

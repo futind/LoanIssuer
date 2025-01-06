@@ -1,20 +1,13 @@
 package ru.neoflex.mscalculator.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.neoflex.mscalculator.dto.CreditDto;
-import ru.neoflex.mscalculator.dto.LoanOfferDto;
-import ru.neoflex.mscalculator.dto.LoanStatementRequestDto;
-import ru.neoflex.mscalculator.dto.ScoringDataDto;
-import ru.neoflex.mscalculator.exception.CreditDeniedException;
+import ru.neoflex.loanissuerlibrary.dto.CreditDto;
+import ru.neoflex.loanissuerlibrary.dto.LoanOfferDto;
+import ru.neoflex.loanissuerlibrary.dto.LoanStatementRequestDto;
+import ru.neoflex.loanissuerlibrary.dto.ScoringDataDto;
+import ru.neoflex.loanissuerlibrary.exception.CreditDeniedException;
 import ru.neoflex.mscalculator.service.CalculatorService;
 
 import java.util.List;

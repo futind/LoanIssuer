@@ -4,10 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import ru.neoflex.msdeal.dto.EmploymentDto;
-import ru.neoflex.msdeal.dto.PassportDto;
-import ru.neoflex.msdeal.dto.enumeration.Gender;
-import ru.neoflex.msdeal.dto.enumeration.MaritalStatus;
+import ru.neoflex.loanissuerlibrary.dto.EmploymentDto;
+import ru.neoflex.loanissuerlibrary.dto.PassportDto;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.Gender;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.MaritalStatus;
 
 import java.time.LocalDate;
 import java.util.UUID;

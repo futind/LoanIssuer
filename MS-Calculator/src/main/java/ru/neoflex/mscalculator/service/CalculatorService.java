@@ -3,11 +3,12 @@ package ru.neoflex.mscalculator.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.neoflex.mscalculator.dto.*;
-import ru.neoflex.mscalculator.dto.enumeration.EmploymentStatus;
-import ru.neoflex.mscalculator.dto.enumeration.Gender;
-import ru.neoflex.mscalculator.exception.CreditDeniedException;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.EmploymentStatus;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.Gender;
+import ru.neoflex.loanissuerlibrary.exception.CreditDeniedException;
 import ru.neoflex.mscalculator.util.RateComparator;
+
+import ru.neoflex.loanissuerlibrary.dto.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

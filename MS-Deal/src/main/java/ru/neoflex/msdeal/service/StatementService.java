@@ -4,12 +4,9 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.neoflex.msdeal.dto.FinishRegistrationRequestDto;
-import ru.neoflex.msdeal.dto.LoanOfferDto;
-import ru.neoflex.msdeal.dto.ScoringDataDto;
-import ru.neoflex.msdeal.dto.StatusHistoryDto;
-import ru.neoflex.msdeal.dto.enumeration.ApplicationStatus;
-import ru.neoflex.msdeal.dto.enumeration.ChangeType;
+import ru.neoflex.loanissuerlibrary.dto.*;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.ApplicationStatus;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.ChangeType;
 import ru.neoflex.msdeal.model.ClientEntity;
 import ru.neoflex.msdeal.model.CreditEntity;
 import ru.neoflex.msdeal.model.StatementEntity;
@@ -30,6 +27,40 @@ public class StatementService {
 
     public StatementEntity findById(UUID id) throws EntityNotFoundException {
         return statementRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
+
+    public ClientEntity findClientByStatementId(UUID id) throws EntityNotFoundException {
+        return findById(id).getClient();
+    }
+
+    public String getSesByStatementId(UUID id) throws EntityNotFoundException {
+        StatementEntity statementEntity = findById(id);
+        return statementEntity.getSesCode();
+    }
+
+    public Boolean isDenied(UUID id) throws EntityNotFoundException {
+        StatementEntity statementEntity = findById(id);
+        return statementEntity.getStatus().equals(ApplicationStatus.CC_DENIED);
+    }
+
+    @Transactional
+    public StatementEntity issueCredit(UUID id) throws EntityNotFoundException {
+        StatementEntity statementEntity = findById(id);
+
+        log.info("Updating Sign Date of the statement and its status.");
+        changeStatementStatus(statementEntity, ApplicationStatus.CREDIT_ISSUED);
+        statementEntity.setSignDate(LocalDateTime.now());
+        return statementRepository.save(statementEntity);
+    }
+
+    @Transactional
+    public StatementEntity updateSesCode(UUID id, String SesCode) throws EntityNotFoundException {
+        StatementEntity statementEntity = statementRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+
+        statementEntity.setSesCode(SesCode);
+
+        log.info("Updating SES-code.");
+        return statementRepository.save(statementEntity);
     }
 
     @Transactional
@@ -100,6 +131,32 @@ public class StatementService {
                 .accountNumber(finishingRequest.getAccountNumber())
                 .isInsuranceEnabled(statementEntity.getAppliedOffer().getIsInsuranceEnabled())
                 .isSalaryClient(statementEntity.getAppliedOffer().getIsSalaryClient())
+                .build();
+    }
+
+    public DocumentDataDto enrichDocumentData(UUID statementId) throws EntityNotFoundException {
+        StatementEntity statementEntity = findById(statementId);
+        CreditEntity creditEntity = statementEntity.getCredit();
+        ClientEntity clientEntity = statementEntity.getClient();
+
+        CreditDto creditDto = CreditDto.builder()
+                .amount(creditEntity.getAmount())
+                .term(creditEntity.getTerm())
+                .monthlyPayment(creditEntity.getMonthlyPayment())
+                .rate(creditEntity.getRate())
+                .psk(creditEntity.getPsk())
+                .paymentSchedule(creditEntity.getPaymentSchedule())
+                .isInsuranceEnabled(creditEntity.getIsInsuranceEnabled())
+                .isSalaryClient(creditEntity.getIsSalaryClient())
+                .build();
+
+        log.info("Creating DocumentDataDto...");
+        return DocumentDataDto.builder()
+                .credit(creditDto)
+                .firstName(clientEntity.getFirstName())
+                .middleName(clientEntity.getMiddleName())
+                .lastName(clientEntity.getLastName())
+                .birthdate(clientEntity.getBirthDate())
                 .build();
     }
 
