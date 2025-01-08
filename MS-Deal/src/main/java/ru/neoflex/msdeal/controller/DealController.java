@@ -1,20 +1,15 @@
 package ru.neoflex.msdeal.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientResponseException;
 import ru.neoflex.loanissuerlibrary.dto.*;
-import ru.neoflex.loanissuerlibrary.dto.enumeration.ApplicationStatus;
 import ru.neoflex.loanissuerlibrary.exception.CreditDeniedException;
 import ru.neoflex.loanissuerlibrary.exception.SesCodeVerificationFailed;
 import ru.neoflex.loanissuerlibrary.exception.StatementChangeBlocked;
 import ru.neoflex.loanissuerlibrary.exception.StatementNotFoundException;
-import ru.neoflex.msdeal.model.ClientEntity;
-import ru.neoflex.msdeal.model.CreditEntity;
-import ru.neoflex.msdeal.model.StatementEntity;
 import ru.neoflex.msdeal.service.*;
 
 import java.util.List;
@@ -43,7 +38,7 @@ public class DealController implements DealApi {
     }
 
     @PostMapping("/offer/select")
-    public void select(@RequestBody @Valid LoanOfferDto offer) {
+    public void select(@RequestBody @Valid LoanOfferDto offer) throws StatementNotFoundException {
         log.info("Received a POST request to /deal/offer/select");
 
         dealService.applyOffer(offer);

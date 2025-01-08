@@ -15,11 +15,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
-import ru.neoflex.msdeal.dto.*;
-import ru.neoflex.msdeal.dto.enumeration.EmploymentStatus;
-import ru.neoflex.msdeal.dto.enumeration.Gender;
-import ru.neoflex.msdeal.dto.enumeration.MaritalStatus;
-import ru.neoflex.msdeal.dto.enumeration.WorkPosition;
+import ru.neoflex.loanissuerlibrary.dto.*;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.EmploymentStatus;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.Gender;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.MaritalStatus;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.WorkPosition;
+import ru.neoflex.loanissuerlibrary.exception.CreditDeniedException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

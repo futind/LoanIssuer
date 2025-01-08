@@ -1,21 +1,20 @@
 package ru.neoflex.msdeal.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.neoflex.msdeal.dto.*;
-import ru.neoflex.msdeal.dto.enumeration.*;
+import ru.neoflex.loanissuerlibrary.dto.*;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.*;
+import ru.neoflex.loanissuerlibrary.exception.StatementNotFoundException;
 import ru.neoflex.msdeal.model.ClientEntity;
 import ru.neoflex.msdeal.model.CreditEntity;
 import ru.neoflex.msdeal.model.StatementEntity;
 import ru.neoflex.msdeal.repository.StatementRepository;
 
-import javax.swing.plaf.nimbus.State;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -91,7 +90,7 @@ public class StatementServiceTest {
     }
 
     @Test
-    void setAppliedOfferSetsTheOffer() throws JsonProcessingException {
+    void setAppliedOfferSetsTheOffer() throws JsonProcessingException, StatementNotFoundException {
 
         StatementEntity statementEntity = new StatementEntity();
         statementEntity.setStatementId(UUID.fromString("0467dde7-f431-43aa-aab4-d7c4f56cc365"));
@@ -121,7 +120,7 @@ public class StatementServiceTest {
     }
 
     @Test
-    void enrichScoringDataReturnsCorrectScoringDataDto() {
+    void enrichScoringDataReturnsCorrectScoringDataDto() throws StatementNotFoundException {
 
         LoanOfferDto appliedOffer = LoanOfferDto.builder()
                 .requestedAmount(BigDecimal.valueOf(100000))
@@ -190,7 +189,7 @@ public class StatementServiceTest {
     }
 
     @Test
-    void setCreditSetsTheCredit() {
+    void setCreditSetsTheCredit() throws StatementNotFoundException {
 
         StatementEntity statementEntity = new StatementEntity();
         CreditEntity creditEntity = new CreditEntity();

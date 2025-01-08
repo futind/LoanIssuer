@@ -73,7 +73,7 @@ public interface DealApi {
     void select(@io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Принятые клиентом условия кредита в виде LoanOfferDto.",
             required = true)
-                @RequestBody @Valid LoanOfferDto offer);
+                @RequestBody @Valid LoanOfferDto offer) throws StatementNotFoundException;
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),

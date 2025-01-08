@@ -11,22 +11,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import ru.neoflex.msdeal.dto.*;
-import ru.neoflex.msdeal.dto.enumeration.EmploymentStatus;
-import ru.neoflex.msdeal.dto.enumeration.Gender;
-import ru.neoflex.msdeal.dto.enumeration.MaritalStatus;
-import ru.neoflex.msdeal.dto.enumeration.WorkPosition;
+import ru.neoflex.loanissuerlibrary.dto.*;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.EmploymentStatus;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.Gender;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.MaritalStatus;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.WorkPosition;
 import ru.neoflex.msdeal.model.ClientEntity;
 import ru.neoflex.msdeal.repository.ClientRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)

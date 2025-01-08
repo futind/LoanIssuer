@@ -1,26 +1,20 @@
 package ru.neoflex.msdeal.service;
 
-import jakarta.persistence.EntityNotFoundException;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import ru.neoflex.msdeal.dto.CreditDto;
-import ru.neoflex.msdeal.dto.PaymentScheduleElementDto;
-import ru.neoflex.msdeal.dto.enumeration.CreditStatus;
+import ru.neoflex.loanissuerlibrary.dto.CreditDto;
+import ru.neoflex.loanissuerlibrary.dto.PaymentScheduleElementDto;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.CreditStatus;
 import ru.neoflex.msdeal.model.CreditEntity;
 import ru.neoflex.msdeal.repository.CreditRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
