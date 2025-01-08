@@ -7,11 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.neoflex.loanissuerlibrary.dto.*;
 import ru.neoflex.loanissuerlibrary.dto.enumeration.ApplicationStatus;
 import ru.neoflex.loanissuerlibrary.dto.enumeration.ChangeType;
+import ru.neoflex.loanissuerlibrary.exception.StatementNotFoundException;
 import ru.neoflex.msdeal.model.ClientEntity;
 import ru.neoflex.msdeal.model.CreditEntity;
 import ru.neoflex.msdeal.model.StatementEntity;
 import ru.neoflex.msdeal.repository.StatementRepository;
 
+import javax.swing.plaf.nimbus.State;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -25,26 +27,33 @@ public class StatementService {
         this.statementRepository = statementRepository;
     }
 
-    public StatementEntity findById(UUID id) throws EntityNotFoundException {
-        return statementRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    public StatementEntity findById(UUID id) throws StatementNotFoundException {
+        StatementEntity statementEntity;
+        try {
+            statementEntity = statementRepository.findById(id).orElse(null);
+        } catch (EntityNotFoundException e) {
+            log.error("Statement was not found!");
+            throw new StatementNotFoundException("Statement was not found. UUID: {}" + id.toString());
+        }
+        return statementEntity;
     }
 
-    public ClientEntity findClientByStatementId(UUID id) throws EntityNotFoundException {
+    public ClientEntity findClientByStatementId(UUID id) throws StatementNotFoundException {
         return findById(id).getClient();
     }
 
-    public String getSesByStatementId(UUID id) throws EntityNotFoundException {
+    public String getSesByStatementId(UUID id) throws StatementNotFoundException {
         StatementEntity statementEntity = findById(id);
         return statementEntity.getSesCode();
     }
 
-    public Boolean isDenied(UUID id) throws EntityNotFoundException {
+    public Boolean isDenied(UUID id) throws StatementNotFoundException {
         StatementEntity statementEntity = findById(id);
         return statementEntity.getStatus().equals(ApplicationStatus.CC_DENIED);
     }
 
     @Transactional
-    public StatementEntity issueCredit(UUID id) throws EntityNotFoundException {
+    public StatementEntity issueCredit(UUID id) throws StatementNotFoundException {
         StatementEntity statementEntity = findById(id);
 
         log.info("Updating Sign Date of the statement and its status.");
@@ -54,8 +63,8 @@ public class StatementService {
     }
 
     @Transactional
-    public StatementEntity updateSesCode(UUID id, String SesCode) throws EntityNotFoundException {
-        StatementEntity statementEntity = statementRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    public StatementEntity updateSesCode(UUID id, String SesCode) throws StatementNotFoundException {
+        StatementEntity statementEntity = findById(id);
 
         statementEntity.setSesCode(SesCode);
 
@@ -97,7 +106,7 @@ public class StatementService {
     }
 
     @Transactional
-    public StatementEntity setAppliedOffer(LoanOfferDto offer) throws EntityNotFoundException {
+    public StatementEntity setAppliedOffer(LoanOfferDto offer) throws StatementNotFoundException {
         StatementEntity statementEntity = findById(offer.getStatementId());
 
         statementEntity.setAppliedOffer(offer);
@@ -108,9 +117,8 @@ public class StatementService {
     }
 
     public ScoringDataDto enrichScoringData(FinishRegistrationRequestDto finishingRequest, UUID statementId)
-                                                                                throws EntityNotFoundException{
-        StatementEntity statementEntity = statementRepository.findById(statementId)
-                .orElseThrow(EntityNotFoundException::new);
+                                                                                throws StatementNotFoundException {
+        StatementEntity statementEntity = findById(statementId);
 
         log.info("Creating ScoringDataDto...");
         return ScoringDataDto.builder()
@@ -134,7 +142,7 @@ public class StatementService {
                 .build();
     }
 
-    public DocumentDataDto enrichDocumentData(UUID statementId) throws EntityNotFoundException {
+    public DocumentDataDto enrichDocumentData(UUID statementId) throws StatementNotFoundException {
         StatementEntity statementEntity = findById(statementId);
         CreditEntity creditEntity = statementEntity.getCredit();
         ClientEntity clientEntity = statementEntity.getClient();
@@ -161,8 +169,7 @@ public class StatementService {
     }
 
     @Transactional
-    public StatementEntity setCredit(UUID statementId, CreditEntity creditEntity)
-                                                                        throws EntityNotFoundException {
+    public StatementEntity setCredit(UUID statementId, CreditEntity creditEntity) throws StatementNotFoundException {
         StatementEntity statementEntity = findById(statementId);
         statementEntity.setCredit(creditEntity);
 

@@ -139,7 +139,7 @@ public interface DealApi {
             example = "f43fc0a7-d98b-4aff-8af7-f42ce739a9cd",
             required = true
     )
-                       @PathVariable("statementId") String statementId) throws EntityNotFoundException,
+                       @PathVariable("statementId") String statementId) throws StatementNotFoundException,
                                                                                StatementChangeBlocked;
 
 
@@ -162,8 +162,8 @@ public interface DealApi {
                     """
     )
     @PostMapping("document/{statementId}/sign")
-    void signDocuments(@PathVariable("statementId") String statementId) throws EntityNotFoundException,
-                                                                               StatementChangeBlocked;
+    void signDocuments(@PathVariable("statementId") String statementId) throws StatementChangeBlocked,
+                                                                               StatementNotFoundException;
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -191,9 +191,7 @@ public interface DealApi {
     )
     @PostMapping("document/{statementId}/code")
     void signingCode(@RequestParam String SesCode, @PathVariable("statementId") String statementId)
-                                                                        throws EntityNotFoundException,
-                                                                               StatementChangeBlocked,
-                                                                               SesCodeVerificationFailed;
+            throws StatementChangeBlocked, SesCodeVerificationFailed, StatementNotFoundException;
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -212,8 +210,8 @@ public interface DealApi {
                     """
     )
     @PutMapping("admin/statement/{statementId}/status")
-    void documentsCreatedStatusChange(@PathVariable("statementId") String statementId)
-            throws EntityNotFoundException, StatementChangeBlocked;
+    void documentsCreatedStatusChange(@PathVariable("statementId") String statementId) throws StatementChangeBlocked,
+                                                                                              StatementNotFoundException;
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK", content = {
@@ -235,6 +233,6 @@ public interface DealApi {
                     """
     )
     @GetMapping("document/{statementId}/data")
-    DocumentDataDto getDocumentData(@PathVariable("statementId") String statementId)
-            throws EntityNotFoundException, StatementChangeBlocked;
+    DocumentDataDto getDocumentData(@PathVariable("statementId") String statementId) throws StatementChangeBlocked,
+                                                                                            StatementNotFoundException;
 }
