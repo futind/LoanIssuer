@@ -1,6 +1,5 @@
 package ru.neoflex.msdeal.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
@@ -71,7 +70,7 @@ public class DealService {
                                                                            StatementNotFoundException,
                                                                            CreditDeniedException,
                                                                            RestClientResponseException {
-        checkIfDenied(statementUUID);
+        throwIfStatementIsDenied(statementUUID);
 
         StatementEntity statementEntity = statementService.findById(statementUUID);
 
@@ -103,7 +102,7 @@ public class DealService {
     }
 
     public void sendDocumentEventAndStatus(UUID statementUUID) throws StatementChangeBlocked, StatementNotFoundException {
-        checkIfDenied(statementUUID);
+        throwIfStatementIsDenied(statementUUID);
 
         String clientEmail = statementService.findClientByStatementId(statementUUID).getEmail();
         statementService.changeStatementStatus(statementService.findById(statementUUID),
@@ -115,8 +114,8 @@ public class DealService {
         kafkaSenderService.sendSendDocumentsMessage(statementUUID, clientEmail);
     }
 
-    public void signDocumentEvent(UUID statementUUID) throws StatementChangeBlocked, StatementNotFoundException {
-        checkIfDenied(statementUUID);
+    public void sesUpdateEvent(UUID statementUUID) throws StatementChangeBlocked, StatementNotFoundException {
+        throwIfStatementIsDenied(statementUUID);
 
         String clientEmail = statementService.findClientByStatementId(statementUUID).getEmail();
         statementService.updateSesCode(statementUUID, utilitiesService.generateSesCode());
@@ -128,10 +127,10 @@ public class DealService {
                                               clientEmail);
     }
 
-    public void SesCodeVerificationEvent(UUID statementUUID, String SesCode) throws StatementChangeBlocked,
+    public void sesCodeVerificationEvent(UUID statementUUID, String SesCode) throws StatementChangeBlocked,
                                                                                     SesCodeVerificationFailed,
                                                                                     StatementNotFoundException {
-        checkIfDenied(statementUUID);
+        throwIfStatementIsDenied(statementUUID);
 
         StatementEntity statementEntity = statementService.findById(statementUUID);
 
@@ -151,7 +150,7 @@ public class DealService {
 
     public void documentCreatedStatusChange(UUID statementUUID) throws StatementChangeBlocked,
                                                                        StatementNotFoundException {
-        checkIfDenied(statementUUID);
+        throwIfStatementIsDenied(statementUUID);
 
         log.info("Received information that documents were created and sent to the client. Changing status...");
 
@@ -162,14 +161,14 @@ public class DealService {
 
     public DocumentDataDto formDocumentData(UUID statementUUID) throws StatementChangeBlocked,
                                                                        StatementNotFoundException {
-        checkIfDenied(statementUUID);
+        throwIfStatementIsDenied(statementUUID);
 
         log.info("Forming the client data needed to create credit documents.");
 
         return statementService.enrichDocumentData(statementUUID);
     }
 
-    private void checkIfDenied(UUID statementUUID) throws StatementChangeBlocked, StatementNotFoundException {
+    public void throwIfStatementIsDenied(UUID statementUUID) throws StatementChangeBlocked, StatementNotFoundException {
         if (statementService.isDenied(statementUUID)) {
             log.warn("Statement had been denied earlier. All the changes are blocked.");
             throw new StatementChangeBlocked("Statement had been denied earlier!");

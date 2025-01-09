@@ -15,10 +15,12 @@ import ru.neoflex.msdeal.repository.CreditRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CreditServiceTest {
@@ -79,6 +81,24 @@ public class CreditServiceTest {
         assertEquals(validCredit.getIsSalaryClient(), savedCreditEntity.getIsSalaryClient());
         assertEquals(validCredit.getPaymentSchedule(), savedCreditEntity.getPaymentSchedule());
         assertEquals(CreditStatus.CALCULATED, savedCreditEntity.getCreditStatus());
+        verify(creditRepository, times(1)).save(any(CreditEntity.class));
+    }
+
+    @Test
+    void updateCreditStatusUpdatesTheStatus() throws Exception {
+        UUID creditId = UUID.randomUUID();
+        CreditEntity creditEntity = new CreditEntity();
+        creditEntity.setCreditId(creditId);
+
+        when(creditRepository.findById(creditId)).thenReturn(Optional.of(creditEntity));
+        when(creditRepository.save(any(CreditEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        CreditEntity result = creditService.updateCreditStatus(creditId);
+
+        assertNotNull(result);
+        assertEquals(CreditStatus.ISSUED, result.getCreditStatus());
+        verify(creditRepository, times(1)).findById(creditId);
+        verify(creditRepository, times(1)).save(any(CreditEntity.class));
     }
 
 }

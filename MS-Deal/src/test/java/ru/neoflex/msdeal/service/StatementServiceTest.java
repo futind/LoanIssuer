@@ -18,6 +18,7 @@ import ru.neoflex.msdeal.repository.StatementRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -49,6 +50,20 @@ public class StatementServiceTest {
                 .passportNumber("123456")
                 .build();
 
+    }
+
+    @Test
+    void findByIdFindsAStatement() throws Exception {
+        UUID statementId = UUID.randomUUID();
+        StatementEntity statementEntity = new StatementEntity();
+        statementEntity.setStatementId(statementId);
+
+        when(statementRepository.findById(statementId)).thenReturn(Optional.of(statementEntity));
+
+        StatementEntity returnedStatement = statementService.findById(statementId);
+
+        assertDoesNotThrow(()->statementService.findById(statementId));
+        assertEquals(statementId, returnedStatement.getStatementId());
     }
 
     @Test
@@ -203,4 +218,117 @@ public class StatementServiceTest {
         assertEquals(creditEntity.getCreditId(), savedStatement.getCredit().getCreditId());
     }
 
+    @Test
+    void IssueCreditCallsValidMethods() throws Exception {
+        UUID statementId = UUID.randomUUID();
+        StatementEntity statementEntity = new StatementEntity();
+        statementEntity.setStatementId(statementId);
+
+        when(statementRepository.findById(statementId)).thenReturn(Optional.of(statementEntity));
+        when(statementRepository.save(any(StatementEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        StatementEntity result = statementService.issueCredit(statementId);
+
+        assertNotNull(result);
+        assertEquals(statementEntity.getStatementId(), result.getStatementId());
+        assertEquals(ApplicationStatus.CREDIT_ISSUED, result.getStatus());
+        assertNotNull(result.getSignDate());
+        verify(statementRepository, times(1)).findById(statementId);
+        verify(statementRepository, times(2)).save(any(StatementEntity.class));
+    }
+
+    @Test
+    void updateSesCodeSavesTheCode() throws Exception {
+        UUID statementId = UUID.randomUUID();
+        StatementEntity statementEntity = new StatementEntity();
+        statementEntity.setStatementId(statementId);
+
+        when(statementRepository.findById(statementId)).thenReturn(Optional.of(statementEntity));
+        when(statementRepository.save(any(StatementEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        statementService.updateSesCode(statementId, "123456");
+
+        verify(statementRepository, times(1)).findById(statementId);
+        verify(statementRepository, times(1)).save(statementEntity);
+    }
+
+    @Test
+    void isDeniedChecksIfDenied() throws Exception {
+        UUID statementId = UUID.randomUUID();
+        StatementEntity statementEntity = new StatementEntity();
+        statementEntity.setStatementId(statementId);
+        statementEntity.setStatus(ApplicationStatus.CC_DENIED);
+
+        when(statementRepository.findById(statementEntity.getStatementId())).thenReturn(Optional.of(statementEntity));
+
+        assertEquals(true, statementService.isDenied(statementEntity.getStatementId()));
+    }
+
+    @Test
+    void getSesByStatementIdReturnsSesCode() throws Exception {
+        UUID statementId = UUID.randomUUID();
+        StatementEntity statementEntity = new StatementEntity();
+        statementEntity.setStatementId(statementId);
+
+        String testSes = "123456";
+        statementEntity.setSesCode(testSes);
+
+        when(statementRepository.findById(statementId)).thenReturn(Optional.of(statementEntity));
+
+        assertEquals(testSes, statementService.getSesByStatementId(statementId));
+    }
+
+    @Test
+    void enrichDocumentReturnsValidDocumentData() throws Exception {
+        UUID statementId = UUID.randomUUID();
+        StatementEntity statementEntity = new StatementEntity();
+        statementEntity.setStatementId(statementId);
+
+        ClientEntity clientEntity = new ClientEntity();
+        clientEntity.setFirstName("John");
+        clientEntity.setLastName("Doe");
+        clientEntity.setMiddleName("M.");
+        clientEntity.setBirthDate(LocalDate.of(1970, 1, 1));
+        statementEntity.setClient(clientEntity);
+
+        PaymentScheduleElementDto element = PaymentScheduleElementDto.builder().build();
+
+        CreditDto creditDto = CreditDto.builder()
+                .amount(new BigDecimal("50000"))
+                .term(6)
+                .monthlyPayment(new BigDecimal("10000"))
+                .rate(new BigDecimal("0.23"))
+                .psk(new BigDecimal("61500"))
+                .paymentSchedule(List.of(element))
+                .isInsuranceEnabled(true)
+                .isSalaryClient(true)
+                .build();
+        CreditEntity creditEntity = new CreditEntity();
+        creditEntity.setAmount(creditDto.getAmount());
+        creditEntity.setTerm(creditDto.getTerm());
+        creditEntity.setMonthlyPayment(creditDto.getMonthlyPayment());
+        creditEntity.setRate(creditDto.getRate());
+        creditEntity.setPsk(creditDto.getPsk());
+        creditEntity.setPaymentSchedule(List.of(element));
+        creditEntity.setIsInsuranceEnabled(true);
+        creditEntity.setIsSalaryClient(true);
+        statementEntity.setCredit(creditEntity);
+
+        when(statementRepository.findById(statementId)).thenReturn(Optional.of(statementEntity));
+
+        DocumentDataDto result = statementService.enrichDocumentData(statementId);
+
+        assertNotNull(result);
+        assertEquals(creditDto.getAmount(), result.getCredit().getAmount());
+        assertEquals(creditDto.getTerm(), result.getCredit().getTerm());
+        assertEquals(creditDto.getMonthlyPayment(), result.getCredit().getMonthlyPayment());
+        assertEquals(creditDto.getRate(), result.getCredit().getRate());
+        assertEquals(creditDto.getPaymentSchedule(), result.getCredit().getPaymentSchedule());
+        assertEquals(creditDto.getIsInsuranceEnabled(), result.getCredit().getIsInsuranceEnabled());
+        assertEquals(creditDto.getIsSalaryClient(), result.getCredit().getIsSalaryClient());
+        assertEquals("John", result.getFirstName());
+        assertEquals("Doe", result.getLastName());
+        assertEquals("M.", result.getMiddleName());
+        assertEquals(LocalDate.of(1970, 1, 1), result.getBirthdate());
+    }
 }

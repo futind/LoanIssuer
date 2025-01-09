@@ -208,13 +208,13 @@ class DealControllerTest {
     void signDocumentCallsValidMethod() throws Exception {
         UUID statementId = UUID.randomUUID();
 
-        doNothing().when(dealService).signDocumentEvent(statementId);
+        doNothing().when(dealService).sesUpdateEvent(statementId);
 
         mockMvc.perform(post("/deal/document/" + statementId.toString() + "/sign"))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        verify(dealService, times(1)).signDocumentEvent(statementId);
+        verify(dealService, times(1)).sesUpdateEvent(statementId);
     }
 
     @Test
@@ -222,14 +222,14 @@ class DealControllerTest {
         UUID statementId = UUID.randomUUID();
         String SesCode = "123456";
 
-        doNothing().when(dealService).SesCodeVerificationEvent(statementId, SesCode);
+        doNothing().when(dealService).sesCodeVerificationEvent(statementId, SesCode);
 
         mockMvc.perform(post("/deal/document/" + statementId.toString() + "/code")
                         .param("SesCode", SesCode))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        verify(dealService, times(1)).SesCodeVerificationEvent(statementId, SesCode);
+        verify(dealService, times(1)).sesCodeVerificationEvent(statementId, SesCode);
     }
 
     @Test

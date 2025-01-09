@@ -66,7 +66,7 @@ public class DealController implements DealApi {
                                                                                       StatementNotFoundException {
         log.info("Received a POST request to /deal/document/{statementId}/sign");
 
-        dealService.signDocumentEvent(UUID.fromString(statementId));
+        dealService.sesUpdateEvent(UUID.fromString(statementId));
     }
 
     @PostMapping("document/{statementId}/code")
@@ -76,7 +76,7 @@ public class DealController implements DealApi {
                                                                                     StatementNotFoundException {
         log.info("Received a POST request to /deal/document/{statementId}/code");
 
-        dealService.SesCodeVerificationEvent(UUID.fromString(statementId), SesCode);
+        dealService.sesCodeVerificationEvent(UUID.fromString(statementId), SesCode);
     }
 
     @PutMapping("admin/statement/{statementId}/status")
