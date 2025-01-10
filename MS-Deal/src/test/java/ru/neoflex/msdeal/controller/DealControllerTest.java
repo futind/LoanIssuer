@@ -1,37 +1,22 @@
 package ru.neoflex.msdeal.controller;
 
-import ch.qos.logback.core.net.server.Client;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.validation.Validator;
-import ru.neoflex.msdeal.dto.*;
-import ru.neoflex.msdeal.dto.enumeration.*;
-import ru.neoflex.msdeal.exception.CreditDeniedException;
-import ru.neoflex.msdeal.model.ClientEntity;
-import ru.neoflex.msdeal.model.CreditEntity;
-import ru.neoflex.msdeal.model.StatementEntity;
-import ru.neoflex.msdeal.service.ClientService;
-import ru.neoflex.msdeal.service.CreditService;
-import ru.neoflex.msdeal.service.RestClientService;
-import ru.neoflex.msdeal.service.StatementService;
+import ru.neoflex.loanissuerlibrary.dto.*;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.*;
+import ru.neoflex.msdeal.service.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -40,39 +25,27 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 class DealControllerTest {
 
     @Mock
-    private CreditService creditService;
-
-    @Mock
-    private StatementService statementService;
-
-    @Mock
-    private ClientService clientService;
-
-    @Mock
-    private RestClientService restClientService;
+    private DealService dealService;
 
     @InjectMocks
     private DealController dealController;
 
-    @Autowired
+
     private MockMvc mockMvc;
 
     private ObjectMapper objectMapper;
 
     private LoanStatementRequestDto validRequest;
     private EmploymentDto validEmployment;
-    private ScoringDataDto validScoringData;
     private LoanOfferDto validLoanOffer;
     private FinishRegistrationRequestDto validFinishRegistration;
-    private CreditDto validCredit;
     private List<LoanOfferDto> validOfferList;
 
     @BeforeEach
@@ -97,25 +70,6 @@ class DealControllerTest {
                 .workExperienceCurrent(19)
                 .build();
 
-        validScoringData = ScoringDataDto.builder()
-                .amount(new BigDecimal("531941"))
-                .term(6)
-                .firstName("John")
-                .lastName("Doe")
-                .gender(Gender.MALE)
-                .birthdate(LocalDate.of(1990, 1, 1))
-                .passportSeries("1234")
-                .passportNumber("123456")
-                .passportIssueDate(LocalDate.of(2004, 1, 1))
-                .passportIssueBranch("Branch which issued the passport")
-                .maritalStatus(MaritalStatus.NOT_MARRIED)
-                .dependentAmount(0)
-                .employment(validEmployment)
-                .accountNumber("12315124")
-                .isInsuranceEnabled(true)
-                .isSalaryClient(true)
-                .build();
-
         validLoanOffer = LoanOfferDto.builder()
                 .statementId(UUID.randomUUID())
                 .requestedAmount(new BigDecimal("100000"))
@@ -136,24 +90,6 @@ class DealControllerTest {
                 .passportIssueBranch("Branch which issued the passport")
                 .employment(validEmployment)
                 .accountNumber("12315124")
-                .build();
-
-        validCredit = CreditDto.builder()
-                .amount(new BigDecimal("100000"))
-                .term(18)
-                .monthlyPayment(new BigDecimal("8419.22"))
-                .rate(new BigDecimal("0.20"))
-                .psk(new BigDecimal("151545.89"))
-                .isInsuranceEnabled(true)
-                .isSalaryClient(false)
-                .paymentSchedule(List.of(PaymentScheduleElementDto.builder()
-                        .number(1)
-                        .date(LocalDate.now().plusMonths(1))
-                        .totalPayment(new BigDecimal("8419.22"))
-                        .interestPayment(new BigDecimal("2166.67"))
-                        .debtPayment(new BigDecimal("6252.55"))
-                        .remainingDebt(new BigDecimal("123747.45"))
-                        .build()))
                 .build();
 
         validOfferList = List.of(
@@ -204,15 +140,11 @@ class DealControllerTest {
     }
 
     @Test
-    void whenGivenValidRequestReturnsValidListOfSize4WithTheSameStatementId() throws Exception {
-        ClientEntity clientEntity = new ClientEntity();
-        StatementEntity statementEntity = new StatementEntity();
+    void whenGivenValidRequestCallsValidMethodAndReturnsListOfSize4() throws Exception {
         UUID statementId = UUID.randomUUID();
-        statementEntity.setStatementId(statementId);
+        validOfferList.stream().forEach(offer -> offer.setStatementId(statementId));
 
-        when(clientService.createClientWithRequest(validRequest)).thenReturn(clientEntity);
-        when(statementService.createStatementWithClient(clientEntity)).thenReturn(statementEntity);
-        when(restClientService.getLoanOffers(validRequest)).thenReturn(validOfferList);
+        when(dealService.createStatementGetOffers(validRequest)).thenReturn(validOfferList);
 
         MvcResult mvcResult = mockMvc.perform(post("/deal/statement")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -221,107 +153,111 @@ class DealControllerTest {
                 .andReturn();
 
         List<LoanOfferDto> responseList = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
-                                                                new TypeReference<List<LoanOfferDto>>() {});
+                new TypeReference<List<LoanOfferDto>>() {});
 
-        assertNotNull(responseList);
         assertEquals(4, responseList.size());
         assertEquals(statementId, responseList.get(0).getStatementId());
         assertEquals(statementId, responseList.get(1).getStatementId());
         assertEquals(statementId, responseList.get(2).getStatementId());
         assertEquals(statementId, responseList.get(3).getStatementId());
-        verify(clientService, times(1)).createClientWithRequest(validRequest);
-        verify(statementService, times(1)).createStatementWithClient(clientEntity);
-        verify(restClientService, times(1)).getLoanOffers(validRequest);
+
+        verify(dealService, times(1)).createStatementGetOffers(validRequest);
     }
 
-    // select
     @Test
-    @DisplayName("""
-            При отправке валидного оффера на /deal/offer/select вернётся Ok, и \
-            метод setAppliedOffer из StatementService будет вызван один раз.""")
-    void selectValidOfferSetsOffer() throws Exception {
-
-        when(statementService.setAppliedOffer(validLoanOffer)).thenReturn(new StatementEntity());
+    void selectCallsValidMethod() throws Exception {
+        doNothing().when(dealService).applyOffer(validLoanOffer);
 
         mockMvc.perform(post("/deal/offer/select")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validLoanOffer)))
                 .andExpect(status().isOk());
 
-        verify(statementService, times(1)).setAppliedOffer(validLoanOffer);
+        verify(dealService, times(1)).applyOffer(validLoanOffer);
     }
 
     @Test
-    void finishRegistrationWithValidDataCorrectlyAssignsCredit() throws Exception {
+    void finishRegistrationCallsValidMethod() throws Exception {
+        UUID statementId = UUID.randomUUID();
 
-        StatementEntity statementEntity = new StatementEntity();
-        statementEntity.setStatementId(UUID.randomUUID());
-        ClientEntity clientEntity = new ClientEntity();
-        clientEntity.setClientId(UUID.randomUUID());
-        CreditEntity creditEntity = new CreditEntity();
-        creditEntity.setCreditId(UUID.randomUUID());
+        doNothing().when(dealService).registrationCalculation(validFinishRegistration, statementId);
 
-        statementEntity.setClient(clientEntity);
-
-        when(statementService.findById(any(UUID.class))).thenReturn(statementEntity);
-        when(clientService.enrichClient(validFinishRegistration, clientEntity.getClientId())).thenReturn(clientEntity);
-        when(statementService.enrichScoringData(validFinishRegistration, statementEntity.getStatementId()))
-                .thenReturn(validScoringData);
-        when(restClientService.getCredit(validScoringData)).thenReturn(validCredit);
-        when(creditService.saveCredit(validCredit)).thenReturn(creditEntity);
-        when(statementService.setCredit(statementEntity.getStatementId(), creditEntity)).thenReturn(statementEntity);
-        doNothing().when(statementService).changeStatementStatus(statementEntity, ApplicationStatus.CC_APPROVED);
-
-        mockMvc.perform(post("/deal/calculate/" + statementEntity.getStatementId())
+        mockMvc.perform(post("/deal/calculate/" + statementId.toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validFinishRegistration)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
 
-        verify(statementService, times(1)).findById(any(UUID.class));
-        verify(clientService, times(1)).enrichClient(validFinishRegistration,
-                                                                            clientEntity.getClientId());
-        verify(statementService, times(1)).enrichScoringData(validFinishRegistration,
-                                                                                     statementEntity.getStatementId());
-        verify(restClientService, times(1)).getCredit(validScoringData);
-        verify(statementService, times(1)).setCredit(statementEntity.getStatementId(),
-                                                                             creditEntity);
-        verify(statementService, times(1)).changeStatementStatus(statementEntity,
-                                                                                         ApplicationStatus.CC_APPROVED);
-
+        verify(dealService, times(1)).registrationCalculation(validFinishRegistration, statementId);
     }
 
     @Test
-    void finishRegistrationThrowsCreditDeniedExceptionWhenPassedUnsuitableScoringData() throws Exception {
-        StatementEntity statementEntity = new StatementEntity();
-        statementEntity.setStatementId(UUID.randomUUID());
-        ClientEntity clientEntity = new ClientEntity();
-        clientEntity.setClientId(UUID.randomUUID());
+    void sendDocumentsCallsValidMethod() throws Exception {
+        UUID statementId = UUID.randomUUID();
 
-        statementEntity.setClient(clientEntity);
+        doNothing().when(dealService).sendDocumentEventAndStatus(statementId);
 
-        when(statementService.findById(any(UUID.class))).thenReturn(statementEntity);
-        when(clientService.enrichClient(validFinishRegistration, clientEntity.getClientId())).thenReturn(clientEntity);
-        when(statementService.enrichScoringData(validFinishRegistration, statementEntity.getStatementId()))
-                .thenReturn(validScoringData);
-        when(restClientService.getCredit(validScoringData)).thenThrow(new CreditDeniedException("Credit denied"));
-        doNothing().when(statementService).changeStatementStatus(statementEntity, ApplicationStatus.CC_DENIED);
+        mockMvc.perform(post("/deal/document/" + statementId.toString() + "/send"))
+                .andExpect(status().isOk())
+                .andReturn();
 
-        mockMvc.perform(post("/deal/calculate/" + statementEntity.getStatementId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(validFinishRegistration)))
-                .andExpect(status().isForbidden());
-
-        verify(statementService, times(1)).findById(any(UUID.class));
-        verify(clientService, times(1)).enrichClient(validFinishRegistration,
-                clientEntity.getClientId());
-        verify(statementService, times(1)).enrichScoringData(validFinishRegistration,
-                statementEntity.getStatementId());
-        verify(restClientService, times(1)).getCredit(validScoringData);
-        verify(creditService, never()).saveCredit(validCredit);
-        verify(statementService, never()).setCredit(any(UUID.class), any(CreditEntity.class));
-        verify(statementService, times(1)).changeStatementStatus(statementEntity,
-                                                                                         ApplicationStatus.CC_DENIED);
-        verify(statementService, never()).changeStatementStatus(statementEntity, ApplicationStatus.CC_APPROVED);
+        verify(dealService, times(1)).sendDocumentEventAndStatus(statementId);
     }
 
+    @Test
+    void signDocumentCallsValidMethod() throws Exception {
+        UUID statementId = UUID.randomUUID();
+
+        doNothing().when(dealService).sesUpdateEvent(statementId);
+
+        mockMvc.perform(post("/deal/document/" + statementId.toString() + "/sign"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        verify(dealService, times(1)).sesUpdateEvent(statementId);
+    }
+
+    @Test
+    void signingCodeCallsValidMethod() throws Exception {
+        UUID statementId = UUID.randomUUID();
+        String SesCode = "123456";
+
+        doNothing().when(dealService).sesCodeVerificationEvent(statementId, SesCode);
+
+        mockMvc.perform(post("/deal/document/" + statementId.toString() + "/code")
+                        .param("SesCode", SesCode))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        verify(dealService, times(1)).sesCodeVerificationEvent(statementId, SesCode);
+    }
+
+    @Test
+    void documentCreatedStatusChangeCallsValidMethod() throws Exception {
+        UUID statementId = UUID.randomUUID();
+
+        doNothing().when(dealService).documentCreatedStatusChange(statementId);
+
+        mockMvc.perform(put("/deal/admin/statement/" + statementId.toString() + "/status"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        verify(dealService, times(1)).documentCreatedStatusChange(statementId);
+    }
+
+    @Test
+    void getDocumentDataCallsValidMethodAndReturnsDocumentDataDto() throws Exception {
+        UUID statementId = UUID.randomUUID();
+
+        when(dealService.formDocumentData(statementId)).thenReturn(DocumentDataDto.builder().build());
+
+        MvcResult mvcResult = mockMvc.perform(get("/deal/document/" + statementId.toString() + "/data"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        DocumentDataDto documentDataDto = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
+                new TypeReference<DocumentDataDto>() {});
+
+        verify(dealService, times(1)).formDocumentData(statementId);
+    }
 }

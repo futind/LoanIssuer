@@ -4,9 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import ru.neoflex.msdeal.dto.CreditDto;
-import ru.neoflex.msdeal.dto.PaymentScheduleElementDto;
-import ru.neoflex.msdeal.dto.enumeration.CreditStatus;
+import ru.neoflex.loanissuerlibrary.dto.PaymentScheduleElementDto;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.CreditStatus;
 
 import java.math.BigDecimal;
 import java.util.List;

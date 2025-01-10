@@ -1,7 +1,6 @@
 package ru.neoflex.msdeal.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,16 +12,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
-import ru.neoflex.msdeal.dto.*;
-import ru.neoflex.msdeal.dto.enumeration.EmploymentStatus;
-import ru.neoflex.msdeal.dto.enumeration.Gender;
-import ru.neoflex.msdeal.dto.enumeration.MaritalStatus;
-import ru.neoflex.msdeal.dto.enumeration.WorkPosition;
-import ru.neoflex.msdeal.exception.CreditDeniedException;
+import ru.neoflex.loanissuerlibrary.dto.*;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.EmploymentStatus;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.Gender;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.MaritalStatus;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.WorkPosition;
+import ru.neoflex.loanissuerlibrary.exception.CreditDeniedException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -213,7 +211,4 @@ public class RestClientServiceTest {
 
         assertThrows(RestClientResponseException.class, () -> restClientService.getCredit(validScoringData));
     }
-
-
-
 }

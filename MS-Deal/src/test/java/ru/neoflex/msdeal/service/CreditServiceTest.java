@@ -1,30 +1,26 @@
 package ru.neoflex.msdeal.service;
 
-import jakarta.persistence.EntityNotFoundException;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import ru.neoflex.msdeal.dto.CreditDto;
-import ru.neoflex.msdeal.dto.PaymentScheduleElementDto;
-import ru.neoflex.msdeal.dto.enumeration.CreditStatus;
+import ru.neoflex.loanissuerlibrary.dto.CreditDto;
+import ru.neoflex.loanissuerlibrary.dto.PaymentScheduleElementDto;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.CreditStatus;
 import ru.neoflex.msdeal.model.CreditEntity;
 import ru.neoflex.msdeal.repository.CreditRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CreditServiceTest {
@@ -85,6 +81,24 @@ public class CreditServiceTest {
         assertEquals(validCredit.getIsSalaryClient(), savedCreditEntity.getIsSalaryClient());
         assertEquals(validCredit.getPaymentSchedule(), savedCreditEntity.getPaymentSchedule());
         assertEquals(CreditStatus.CALCULATED, savedCreditEntity.getCreditStatus());
+        verify(creditRepository, times(1)).save(any(CreditEntity.class));
+    }
+
+    @Test
+    void updateCreditStatusUpdatesTheStatus() throws Exception {
+        UUID creditId = UUID.randomUUID();
+        CreditEntity creditEntity = new CreditEntity();
+        creditEntity.setCreditId(creditId);
+
+        when(creditRepository.findById(creditId)).thenReturn(Optional.of(creditEntity));
+        when(creditRepository.save(any(CreditEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        CreditEntity result = creditService.updateCreditStatus(creditId);
+
+        assertNotNull(result);
+        assertEquals(CreditStatus.ISSUED, result.getCreditStatus());
+        verify(creditRepository, times(1)).findById(creditId);
+        verify(creditRepository, times(1)).save(any(CreditEntity.class));
     }
 
 }

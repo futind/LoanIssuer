@@ -10,12 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import ru.neoflex.mscalculator.dto.*;
-import ru.neoflex.mscalculator.dto.enumeration.EmploymentStatus;
-import ru.neoflex.mscalculator.dto.enumeration.Gender;
-import ru.neoflex.mscalculator.dto.enumeration.MaritalStatus;
-import ru.neoflex.mscalculator.dto.enumeration.WorkPosition;
-import ru.neoflex.mscalculator.exception.CreditDeniedException;
+import ru.neoflex.loanissuerlibrary.dto.*;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.EmploymentStatus;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.Gender;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.MaritalStatus;
+import ru.neoflex.loanissuerlibrary.dto.enumeration.WorkPosition;
+import ru.neoflex.loanissuerlibrary.exception.CreditDeniedException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

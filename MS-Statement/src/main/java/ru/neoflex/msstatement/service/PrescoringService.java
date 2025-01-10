@@ -1,10 +1,9 @@
 package ru.neoflex.msstatement.service;
 
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.neoflex.msstatement.dto.LoanStatementRequestDto;
-import ru.neoflex.msstatement.exception.PrescoringFailedException;
+import ru.neoflex.loanissuerlibrary.dto.LoanStatementRequestDto;
+import ru.neoflex.loanissuerlibrary.exception.PrescoringFailedException;
 
 @Slf4j
 @Service
