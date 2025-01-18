@@ -11,16 +11,15 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientResponseException;
-import ru.neoflex.loanissuerlibrary.dto.DocumentDataDto;
-import ru.neoflex.loanissuerlibrary.dto.FinishRegistrationRequestDto;
-import ru.neoflex.loanissuerlibrary.dto.LoanOfferDto;
-import ru.neoflex.loanissuerlibrary.dto.LoanStatementRequestDto;
+import ru.neoflex.loanissuerlibrary.dto.*;
 import ru.neoflex.loanissuerlibrary.exception.CreditDeniedException;
 import ru.neoflex.loanissuerlibrary.exception.SesCodeVerificationFailed;
 import ru.neoflex.loanissuerlibrary.exception.StatementChangeBlocked;
 import ru.neoflex.loanissuerlibrary.exception.StatementNotFoundException;
 
+import java.awt.*;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/deal")
@@ -82,6 +81,9 @@ public interface DealApi {
             }),
             @ApiResponse(responseCode = "403", description = "Credit application denied", content = {
                     @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "404", description = "Statement was not found", content = {
+                    @Content(mediaType = "application/json")
             })
     })
     @Operation(
@@ -105,7 +107,7 @@ public interface DealApi {
             description = "Дополнительные данные о клиенте, необходимые для скоринга.",
             required = true)
                             @RequestBody @Valid FinishRegistrationRequestDto request,
-                            @PathVariable("statementId") String statementId)
+                            @PathVariable("statementId") UUID statementId)
             throws CreditDeniedException, RestClientResponseException,
                    StatementNotFoundException, StatementChangeBlocked;
 
@@ -139,7 +141,7 @@ public interface DealApi {
             example = "f43fc0a7-d98b-4aff-8af7-f42ce739a9cd",
             required = true
     )
-                       @PathVariable("statementId") String statementId) throws StatementNotFoundException,
+                       @PathVariable("statementId") UUID statementId) throws StatementNotFoundException,
                                                                                StatementChangeBlocked;
 
 
@@ -162,7 +164,7 @@ public interface DealApi {
                     """
     )
     @PostMapping("document/{statementId}/sign")
-    void signDocuments(@PathVariable("statementId") String statementId) throws StatementChangeBlocked,
+    void signDocuments(@PathVariable("statementId") UUID statementId) throws StatementChangeBlocked,
                                                                                StatementNotFoundException;
 
     @ApiResponses(value = {
@@ -190,7 +192,7 @@ public interface DealApi {
                     """
     )
     @PostMapping("document/{statementId}/code")
-    void signingCode(@RequestParam String SesCode, @PathVariable("statementId") String statementId)
+    void signingCode(@RequestParam String code, @PathVariable("statementId") UUID statementId)
             throws StatementChangeBlocked, SesCodeVerificationFailed, StatementNotFoundException;
 
     @ApiResponses(value = {
@@ -210,7 +212,7 @@ public interface DealApi {
                     """
     )
     @PutMapping("admin/statement/{statementId}/status")
-    void documentsCreatedStatusChange(@PathVariable("statementId") String statementId) throws StatementChangeBlocked,
+    void documentsCreatedStatusChange(@PathVariable("statementId") UUID statementId) throws StatementChangeBlocked,
                                                                                               StatementNotFoundException;
 
     @ApiResponses(value = {
@@ -233,6 +235,39 @@ public interface DealApi {
                     """
     )
     @GetMapping("document/{statementId}/data")
-    DocumentDataDto getDocumentData(@PathVariable("statementId") String statementId) throws StatementChangeBlocked,
+    DocumentDataDto getDocumentData(@PathVariable("statementId") UUID statementId) throws StatementChangeBlocked,
                                                                                             StatementNotFoundException;
+
+    @Operation(
+            summary = "Получение заявки по уникальному идентификатору",
+            description = """
+                    На вход получаем UUID заявки, если такая заявка есть в базе данных, \
+                    то на основе заявки формируется StatementDto со всеми данными, что есть в \
+                    заявке и отправляются как ответ на запрос.\r\n
+                    Если же заявки с таким UUID не было найдено, то вернётся код 404.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = {
+                    @Content(mediaType = "application/json", schema =
+                    @Schema(implementation = StatementDto.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Statement not found", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
+    @GetMapping("/admin/statement/{statementId}")
+    StatementDto getStatementById(@PathVariable("statementId") UUID statementId) throws StatementNotFoundException;
+
+    @Operation(
+            summary = "Получение всех заявок, что есть в базе данных"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK", content = {
+                    @Content(mediaType = "application/json", array =
+                    @ArraySchema(schema = @Schema(implementation = StatementDto.class)))
+            })
+    })
+    @GetMapping("/admin/statement")
+    List<StatementDto> getAllStatements();
 }

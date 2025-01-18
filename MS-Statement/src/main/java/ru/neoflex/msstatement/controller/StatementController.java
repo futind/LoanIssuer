@@ -29,8 +29,7 @@ public class StatementController implements StatementApi {
         this.prescoringService = prescoringService;
     }
 
-    @PostMapping()
-    @Override
+    @PostMapping
     public List<LoanOfferDto> getOffers(@RequestBody @Valid LoanStatementRequestDto request)
                                                             throws PrescoringFailedException,
                                                                    RestClientResponseException {
@@ -42,7 +41,6 @@ public class StatementController implements StatementApi {
     }
 
     @PostMapping("/offer")
-    @Override
     public void selectOffer(@RequestBody @Valid LoanOfferDto offer) throws RestClientResponseException {
         log.info("Got valid request to /statement/offer");
         restClientService.selectOffer(offer);

@@ -16,6 +16,7 @@ import ru.neoflex.msdeal.repository.StatementRepository;
 import javax.swing.plaf.nimbus.State;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -28,12 +29,10 @@ public class StatementService {
     }
 
     public StatementEntity findById(UUID id) throws StatementNotFoundException {
-        StatementEntity statementEntity;
-        try {
-            statementEntity = statementRepository.findById(id).orElse(null);
-        } catch (EntityNotFoundException e) {
+        StatementEntity statementEntity = statementRepository.findById(id).orElse(null);
+        if (statementEntity == null) {
             log.error("Statement was not found!");
-            throw new StatementNotFoundException("Statement was not found. UUID: {}" + id.toString());
+            throw new StatementNotFoundException("Could not find statement with UUID: " + id.toString());
         }
         return statementEntity;
     }
@@ -176,5 +175,29 @@ public class StatementService {
         log.info("Set the credit to the statement. Saving the statement...");
 
         return statementRepository.save(statementEntity);
+    }
+
+    public StatementDto createStatementDto(StatementEntity statementEntity) {
+        UUID clientId = statementEntity.getClient().getClientId();
+        UUID creditId = null;
+        if (statementEntity.getCredit() != null) {
+            creditId = statementEntity.getCredit().getCreditId();
+        }
+
+        return StatementDto.builder()
+                .statementId(statementEntity.getStatementId())
+                .clientId(clientId)
+                .creditId(creditId)
+                .status(statementEntity.getStatus())
+                .creationDate(statementEntity.getCreationDate())
+                .appliedOffer(statementEntity.getAppliedOffer())
+                .signDate(statementEntity.getSignDate())
+                .sesCode(statementEntity.getSesCode())
+                .statusHistory(statementEntity.getStatusHistory())
+                .build();
+    }
+
+    public List<StatementDto> pullAllStatements() {
+        return statementRepository.findAll().stream().map(this::createStatementDto).toList();
     }
 }
