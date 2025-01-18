@@ -198,12 +198,6 @@ public class StatementService {
     }
 
     public List<StatementDto> pullAllStatements() {
-        List<StatementEntity> entities = statementRepository.findAll();
-
-        List<StatementDto> statementDtos = new ArrayList<>();
-        for (StatementEntity entity : entities) {
-            statementDtos.add(createStatementDto(entity));
-        }
-        return statementDtos;
+        return statementRepository.findAll().stream().map(this::createStatementDto).toList();
     }
 }
