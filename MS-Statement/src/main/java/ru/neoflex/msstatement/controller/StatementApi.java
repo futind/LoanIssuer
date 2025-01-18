@@ -45,7 +45,7 @@ public interface StatementApi {
                     по мере уменьшения процентной ставки.".
                     """
     )
-    @PostMapping()
+    @PostMapping
     List<LoanOfferDto> getOffers(@io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Заявка на кредит от клиента в виде LoanStatementRequestDto.",
             required = true) @RequestBody @Valid LoanStatementRequestDto request)
@@ -59,7 +59,7 @@ public interface StatementApi {
             })
     })
     @Operation(
-            summary = "Расчёт возможных условий кредита",
+            summary = "Выбор кредитного предложения клиентом",
             description = """
                     По API приходит LoanOfferDto, валидируется. \r\n
                     Отправляется POST запрос на /deal/offer/select через RestClient \

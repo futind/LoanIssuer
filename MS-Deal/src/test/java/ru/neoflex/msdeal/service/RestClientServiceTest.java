@@ -183,7 +183,7 @@ public class RestClientServiceTest {
     }
 
     @Test
-    void getCreditWithUnsuitableScoringDataThrowsCreditDeniedException() {
+    void getCreditWithUnsuitableScoringDataThrowsRestClientResponseExceptionWith403() {
         validScoringData.getEmployment().setEmploymentStatus(EmploymentStatus.NOT_EMPLOYED);
 
         when(restClient.post()
@@ -194,7 +194,7 @@ public class RestClientServiceTest {
                 .body(CreditDto.class))
                 .thenThrow(new RestClientResponseException("msg", HttpStatus.FORBIDDEN, "statustxt", null, null, null));
 
-        assertThrows(CreditDeniedException.class, () -> restClientService.getCredit(validScoringData));
+        assertThrows(RestClientResponseException.class, () -> restClientService.getCredit(validScoringData));
     }
 
     @Test

@@ -40,27 +40,15 @@ public class RestClientService {
                 .body(new ParameterizedTypeReference<List<LoanOfferDto>>() {});
     }
 
-    public CreditDto getCredit(ScoringDataDto scoringData) throws CreditDeniedException,
-                                                                  RestClientResponseException {
+    public CreditDto getCredit(ScoringDataDto scoringData) throws RestClientResponseException {
         log.info("Making a request to {}...", baseUri + creditUri);
         CreditDto creditDto;
 
-        try {
-             creditDto = restClient.post()
+        return restClient.post()
                     .uri(baseUri + creditUri)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(scoringData)
                     .retrieve()
                     .body(CreditDto.class);
-        } catch (RestClientResponseException e) {
-            if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
-                throw new CreditDeniedException(e.getMessage());
-            } else {
-                throw e;
-            }
-        }
-
-        return creditDto;
     }
-
 }

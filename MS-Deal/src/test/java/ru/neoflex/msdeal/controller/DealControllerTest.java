@@ -225,7 +225,7 @@ class DealControllerTest {
         doNothing().when(dealService).sesCodeVerificationEvent(statementId, SesCode);
 
         mockMvc.perform(post("/deal/document/" + statementId.toString() + "/code")
-                        .param("SesCode", SesCode))
+                        .param("code", SesCode))
                 .andExpect(status().isOk())
                 .andReturn();
 

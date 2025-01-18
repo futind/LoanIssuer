@@ -8,6 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.client.RestClientResponseException;
 import ru.neoflex.loanissuerlibrary.dto.*;
 import ru.neoflex.loanissuerlibrary.dto.enumeration.*;
 import ru.neoflex.loanissuerlibrary.exception.CreditDeniedException;
@@ -264,7 +266,7 @@ public class DealServiceTest {
     }
 
     @Test
-    void registrationCalculationThrowsAndSendsDeniedMessageIfCreditWasDenied() throws Exception {
+    void registrationCalculationThrowsAndSendsDeniedMessageIf403OnCalculator() throws Exception {
         UUID statementId = UUID.randomUUID();
         UUID clientId = UUID.randomUUID();
 
@@ -277,18 +279,22 @@ public class DealServiceTest {
         statementEntity.setCredit(creditEntity);
         statementEntity.setClient(clientEntity);
 
+        RestClientResponseException e = new RestClientResponseException("msg", 403, "status", HttpHeaders.EMPTY, null, null);
+
         validScoringData.getEmployment().setEmploymentStatus(EmploymentStatus.NOT_EMPLOYED);
 
         when(statementService.isDenied(statementId)).thenReturn(false);
         when(statementService.findById(statementId)).thenReturn(statementEntity);
         when(clientService.enrichClient(validFinishRegistration, clientId)).thenReturn(clientEntity);
         when(statementService.enrichScoringData(validFinishRegistration, statementId)).thenReturn(validScoringData);
-        when(restClientService.getCredit(validScoringData)).thenThrow(CreditDeniedException.class);
+        when(restClientService.getCredit(validScoringData)).thenThrow(e);
         doNothing().when(statementService).changeStatementStatus(statementEntity, ApplicationStatus.CC_DENIED);
         doNothing().when(kafkaSenderService).sendStatementDeniedMessage(statementId,
                                                                         statementEntity.getClient().getEmail());
 
-        assertThrows(CreditDeniedException.class,
+
+
+        assertThrows(RestClientResponseException.class,
                      ()->dealService.registrationCalculation(validFinishRegistration, statementId));
         verify(clientService, times(1)).enrichClient(validFinishRegistration, clientId);
         verify(statementService, times(1)).enrichScoringData(validFinishRegistration, statementId);

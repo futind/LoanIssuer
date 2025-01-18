@@ -23,15 +23,21 @@ import java.util.Map;
 public class RestExceptionHandler {
 
     @ExceptionHandler(RestClientResponseException.class)
-    public ResponseEntity<Object> handleCreditDeniedException(RestClientResponseException e, WebRequest request) {
-        log.warn("RestClientResponseException {}", e.getMessage());
-
+    public ResponseEntity<Object> handleRestClientResponseException(RestClientResponseException e,
+                                                                    WebRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();
+        LinkedHashMap<String, Object> cause = e.getResponseBodyAs(LinkedHashMap.class);
+        String error = "";
+        if (cause != null && cause.containsKey("error")) {
+            error = cause.get("error").toString();
+        }
+
         body.put("timestamp", LocalDateTime.now());
         body.put("status", e.getStatusCode().value());
-        body.put("error", e.getResponseBodyAsString());
+        body.put("error", error);
         body.put("path", request.getDescription(false).replace("uri=", ""));
 
+        log.warn("RestClientResponseException: {}", error);
         return new ResponseEntity<>(body, e.getStatusCode());
     }
 
@@ -51,8 +57,8 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<Object> handleStatementNotFoundException(EntityNotFoundException e, WebRequest request) {
-        log.warn("StatementNotFoundException {}", e.getMessage());
+    public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException e, WebRequest request) {
+        log.warn("EntityNotFoundException {}", e.getMessage());
 
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
@@ -62,6 +68,21 @@ public class RestExceptionHandler {
 
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(StatementNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Object> handleStatementNotFoundException(StatementNotFoundException e, WebRequest request) {
+        log.warn("StatementNotFoundException {}", e.getMessage());
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.NOT_FOUND.value());
+        body.put("error", "Statement was not found: " + e.getMessage());
+        body.put("path", request.getDescription(false).replace("uri=", ""));
+
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
 
     @ExceptionHandler(SesCodeVerificationFailed.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)

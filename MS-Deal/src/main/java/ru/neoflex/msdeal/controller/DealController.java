@@ -2,6 +2,7 @@ package ru.neoflex.msdeal.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientResponseException;
@@ -44,54 +45,70 @@ public class DealController implements DealApi {
         dealService.applyOffer(offer);
     }
 
-    @PostMapping("calculate/{statementId}")
+    @PostMapping("/calculate/{statementId}")
     public void finishRegistration(@RequestBody @Valid FinishRegistrationRequestDto request,
-                                   @PathVariable("statementId") String statementId)
+                                   @PathVariable("statementId") UUID statementId)
             throws CreditDeniedException,
             RestClientResponseException,
             StatementNotFoundException, StatementChangeBlocked {
         log.info("Received a POST request to /deal/calculate/{statementId}");
-        dealService.registrationCalculation(request, UUID.fromString(statementId));
+        dealService.registrationCalculation(request, statementId);
     }
 
-    @PostMapping("document/{statementId}/send")
-    public void sendDocuments(@PathVariable("statementId") String statementId) throws StatementChangeBlocked,
+    @PostMapping("/document/{statementId}/send")
+    public void sendDocuments(@PathVariable("statementId") UUID statementId) throws StatementChangeBlocked,
                                                                                       StatementNotFoundException {
         log.info("Received a POST request to /deal/document/{statementId}/send");
-        dealService.sendDocumentEventAndStatus(UUID.fromString(statementId));
+        dealService.sendDocumentEventAndStatus(statementId);
     }
 
-    @PostMapping("document/{statementId}/sign")
-    public void signDocuments(@PathVariable("statementId") String statementId) throws StatementChangeBlocked,
+    @PostMapping("/document/{statementId}/sign")
+    public void signDocuments(@PathVariable("statementId") UUID statementId) throws StatementChangeBlocked,
                                                                                       StatementNotFoundException {
         log.info("Received a POST request to /deal/document/{statementId}/sign");
 
-        dealService.sesUpdateEvent(UUID.fromString(statementId));
+        dealService.sesUpdateEvent(statementId);
     }
 
-    @PostMapping("document/{statementId}/code")
-    public void signingCode(@RequestParam String SesCode,
-                            @PathVariable("statementId") String statementId) throws StatementChangeBlocked,
+    @PostMapping("/document/{statementId}/code")
+    public void signingCode(@RequestParam String code,
+                            @PathVariable("statementId") UUID statementId) throws StatementChangeBlocked,
                                                                                     SesCodeVerificationFailed,
                                                                                     StatementNotFoundException {
         log.info("Received a POST request to /deal/document/{statementId}/code");
 
-        dealService.sesCodeVerificationEvent(UUID.fromString(statementId), SesCode);
+        dealService.sesCodeVerificationEvent(statementId, code);
     }
 
-    @PutMapping("admin/statement/{statementId}/status")
-    public void documentsCreatedStatusChange(String statementId) throws StatementNotFoundException,
+    @PutMapping("/admin/statement/{statementId}/status")
+    public void documentsCreatedStatusChange(@PathVariable("statementId") UUID statementId)
+                                                                 throws StatementNotFoundException,
                                                                         StatementChangeBlocked {
         log.info("Received a PUT request to /deal/admin/statement/{statementId}/status");
 
-        dealService.documentCreatedStatusChange(UUID.fromString(statementId));
+        dealService.documentCreatedStatusChange(statementId);
     }
 
-    @GetMapping("document/{statementId}/data")
-    public DocumentDataDto getDocumentData(@PathVariable("statementId") String statementId)
+    @GetMapping("/document/{statementId}/data")
+    public DocumentDataDto getDocumentData(@PathVariable("statementId") UUID statementId)
                                             throws StatementNotFoundException, StatementChangeBlocked {
         log.info("Received a GET request to /deal/document/{statementId}/data");
 
-        return dealService.formDocumentData(UUID.fromString(statementId));
+        return dealService.formDocumentData(statementId);
+    }
+
+    @GetMapping("/admin/statement/{statementId}")
+    public StatementDto getStatementById(@PathVariable("statementId") UUID statementId)
+                                                     throws StatementNotFoundException {
+        log.info("Received a GET request to /deal/admin/statement/{statementId}");
+
+        return dealService.getStatement(statementId);
+    }
+
+    @GetMapping("/admin/statement")
+    public List<StatementDto> getAllStatements() {
+        log.info("Received a GET request to /deal/admin/statement");
+
+        return dealService.getAllStatements();
     }
 }

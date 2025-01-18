@@ -18,15 +18,21 @@ import java.util.Map;
 public class RestExceptionHandler {
 
     @ExceptionHandler(RestClientResponseException.class)
-    public ResponseEntity<Object> handleCreditDeniedException(RestClientResponseException e, WebRequest request) {
-        log.warn("RestClientResponseException {}", e.getMessage());
-
+    public ResponseEntity<Object> handleRestClientResponseException(RestClientResponseException e,
+                                                                    WebRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();
+        LinkedHashMap<String, Object> cause = e.getResponseBodyAs(LinkedHashMap.class);
+        String error = "";
+        if (cause != null && cause.containsKey("error")) {
+            error = cause.get("error").toString();
+        }
+
         body.put("timestamp", LocalDateTime.now());
         body.put("status", e.getStatusCode().value());
-        body.put("error", e.getResponseBodyAsString());
+        body.put("error", error);
         body.put("path", request.getDescription(false).replace("uri=", ""));
 
+        log.warn("RestClientResponseException: {}", error);
         return new ResponseEntity<>(body, e.getStatusCode());
     }
 

@@ -1,6 +1,7 @@
 package ru.neoflex.msdeal.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 import ru.neoflex.loanissuerlibrary.dto.*;
@@ -13,6 +14,7 @@ import ru.neoflex.msdeal.model.ClientEntity;
 import ru.neoflex.msdeal.model.CreditEntity;
 import ru.neoflex.msdeal.model.StatementEntity;
 
+import javax.swing.plaf.nimbus.State;
 import java.util.List;
 import java.util.UUID;
 
@@ -83,12 +85,13 @@ public class DealService {
 
         try {
             creditDto = restClientService.getCredit(scoringDataDto);
-        } catch (CreditDeniedException e) {
-            log.warn("Client's application was denied. Setting CC_DENIED status to the statement.");
-            statementService.changeStatementStatus(statementEntity, ApplicationStatus.CC_DENIED);
-
-            log.info("Sending a request to send an email to the client about his loan application denial.");
-            kafkaSenderService.sendStatementDeniedMessage(statementUUID, statementEntity.getClient().getEmail());
+        } catch (RestClientResponseException e) {
+            if (e.getStatusCode().equals(HttpStatusCode.valueOf(403))) {
+                log.warn("Client's application was denied. Setting CC_DENIED status to the statement.");
+                statementService.changeStatementStatus(statementEntity, ApplicationStatus.CC_DENIED);
+                log.info("Sending a request to send an email to the client about his loan application denial.");
+                kafkaSenderService.sendStatementDeniedMessage(statementUUID, statementEntity.getClient().getEmail());
+            }
             throw e;
         }
 
@@ -136,6 +139,8 @@ public class DealService {
 
         if (!statementEntity.getSesCode().equals(SesCode)) {
             log.error("SES-code provided by a client is not valid");
+            statementService.changeStatementStatus(statementEntity, ApplicationStatus.CC_DENIED);
+            kafkaSenderService.sendStatementDeniedMessage(statementUUID, statementEntity.getClient().getEmail());
             throw new SesCodeVerificationFailed("SES codes do not match!");
         }
 
@@ -166,6 +171,18 @@ public class DealService {
         log.info("Forming the client data needed to create credit documents.");
 
         return statementService.enrichDocumentData(statementUUID);
+    }
+
+    public StatementDto getStatement(UUID statementUUID) throws StatementNotFoundException {
+        StatementEntity statementEntity = statementService.findById(statementUUID);
+
+        log.info("Retrieving the statement from the database.");
+
+        return statementService.createStatementDto(statementEntity);
+    }
+
+    public List<StatementDto> getAllStatements() {
+        return statementService.pullAllStatements();
     }
 
     public void throwIfStatementIsDenied(UUID statementUUID) throws StatementChangeBlocked, StatementNotFoundException {
