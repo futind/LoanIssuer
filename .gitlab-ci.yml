@@ -58,7 +58,9 @@ test_services:
       foreach ($service in $services) {
         echo "Testing $service..."
         mvn -DskipTests=false -f $service/pom.xml test jacoco:report
-        bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}
+        Invoke-WebRequest -Uri https://codecov.io/bash -OutFile codecov.sh
+        chmod +x codecov.sh
+        ./codecov.sh -t $env:CODECOV_TOKEN
       }
   artifacts:
     when: always
@@ -78,7 +80,7 @@ sonar_analysis:
   stage: quality
   script:
     - mvn sonar:sonar
-      -Dsonar.projectKey=${SONAR_PROJECT_KEY}
-      -Dsonar.organization=${SONAR_ORG}
-      -Dsonar.host.url=${SONAR_HOST_URL}
-      -Dsonar.token=${SONAR_TOKEN}
+      -Dsonar.projectKey=$env:SONAR_PROJECT_KEY
+      -Dsonar.organization=$env:SONAR_ORG
+      -Dsonar.host.url=$env:SONAR_HOST_URL
+      -Dsonar.token=$env:SONAR_TOKEN
