@@ -78,8 +78,4 @@ sonar_analysis:
     - merge_requests
   stage: quality
   script:
-    - mvn sonar:sonar
-      -Dsonar.projectKey=$env:SONAR_PROJECT_KEY
-      -Dsonar.organization=$env:SONAR_ORG
-      -Dsonar.host.url=$env:SONAR_HOST_URL
-      -Dsonar.token=$env:SONAR_TOKEN
+    - mvn sonar:sonar -Dsonar.projectKey=$env:SONAR_PROJECT_KEY -Dsonar.organization=$env:SONAR_ORG -Dsonar.host.url=$env:SONAR_HOST_URL -Dsonar.token=$env:SONAR_TOKEN
