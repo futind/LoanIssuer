@@ -54,11 +54,7 @@ test_services:
   script:
     - for service in MS-Calculator MS-Deal MS-Statement MS-Dossier MS-Gateway; do
         echo "Testing $service...";
-        mvn -DskipTests=false -f $service/pom.xml test jacoco:report > /dev/null 2>&1;
-        echo $service;
-        echo ${CODECOV_TOKEN};
-        pwd;
-        ls -al;
+        mvn -DskipTests=false -f $service/pom.xml test jacoco:report;
         bash <(curl -s https://codecov.io/bash) -t "${CODECOV_TOKEN}" -f "$service/target/site/jacoco/jacoco.xml" -F "$service";
       done
   artifacts:
@@ -78,8 +74,9 @@ sonar_analysis:
     - merge_requests
   stage: quality
   script:
-    - echo "Running Sonar analysis for $service...";
-    - for service in MS-Calculator MS-Deal MS-Statement MS-Dossier MS-Gateway; do
-        echo "Running SonarQube analysis for $service...";
-        mvn clean verify sonar:sonar -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.organization=${SONAR_ORG} -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.token=${SONAR_TOKEN} -Dsonar.coverage.jacoco.xmlReportPaths="../$service/target/site/jacoco/jacoco.xml" -Dsonar.modules=$service;
-      done;
+    - echo "Running SonarQube analysis for the project...";
+    - mvn clean verify sonar:sonar \
+      -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+      -Dsonar.organization=${SONAR_ORG} \
+      -Dsonar.host.url=https://sonarcloud.io \
+      -Dsonar.token=${SONAR_TOKEN}
