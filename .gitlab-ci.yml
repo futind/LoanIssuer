@@ -11,36 +11,36 @@ cache:
   paths:
     - .m2/repository/
 
-before_build:
-  stage: build
-  only:
-    - main
-    - develop
-    - merge_requests
-  script:
-    - mvn install:install-file
-      -Dfile=".\Libs\LoanIssuerLibrary-0.0.1-SNAPSHOT.jar"
-      -DgroupId="ru.neoflex"
-      -DartifactId="loan-issuer-library"
-      -Dversion="0.0.1-SNAPSHOT"
-      -Dpackaging=jar
+# before_build:
+#   stage: build
+#   only:
+#     - main
+#     - develop
+#     - merge_requests
+#   script:
+#     - mvn install:install-file
+#       -Dfile=".\Libs\LoanIssuerLibrary-0.0.1-SNAPSHOT.jar"
+#       -DgroupId="ru.neoflex"
+#       -DartifactId="loan-issuer-library"
+#       -Dversion="0.0.1-SNAPSHOT"
+#       -Dpackaging=jar
 
-build_services:
-  stage: build
-  needs:
-    - before_build
-  only:
-    - main
-    - develop
-    - merge_requests
-  script:
-    - for service in MS-Calculator MS-Deal MS-Statement MS-Dossier MS-Gateway; do
-        echo "Building $service...";
-        mvn -DskipTests=true -f $service/pom.xml clean package;
-      done
-  artifacts:
-    paths:
-      - MS-*/target/*.jar
+# build_services:
+#   stage: build
+#   needs:
+#     - before_build
+#   only:
+#     - main
+#     - develop
+#     - merge_requests
+#   script:
+#     - for service in MS-Calculator MS-Deal MS-Statement MS-Dossier MS-Gateway; do
+#         echo "Building $service...";
+#         mvn -DskipTests=true -f $service/pom.xml clean package;
+#       done
+#   artifacts:
+#     paths:
+#       - MS-*/target/*.jar
 
 test_services:
   stage: test
@@ -54,8 +54,8 @@ test_services:
     - for service in MS-Calculator MS-Deal MS-Statement MS-Dossier MS-Gateway; do
         echo "Testing $service...";
         mvn -DskipTests=false -f $service/pom.xml test jacoco:report > /dev/null 2>&1;
-        echo $service
-        echo ${CODECOV_TOKEN}
+        echo $service;
+        echo ${CODECOV_TOKEN};
         bash <(curl -s https://codecov.io/bash) -t "${CODECOV_TOKEN}" -f "$service/target/site/jacoco/jacoco.xml" -F "$service";
       done
   artifacts:
