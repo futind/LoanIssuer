@@ -81,9 +81,5 @@ sonar_analysis:
     - echo "Running Sonar analysis for $service...";
     - for service in MS-Calculator MS-Deal MS-Statement MS-Dossier MS-Gateway; do
         echo "Running SonarQube analysis for $service...";
-        cd $service;
-
         mvn clean verify sonar:sonar -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.organization=${SONAR_ORG} -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.token=${SONAR_TOKEN} -Dsonar.coverage.jacoco.xmlReportPaths="../$service/target/site/jacoco/jacoco.xml" -Dsonar.modules=$service;
-      
-        cd ..;
       done;
