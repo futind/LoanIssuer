@@ -82,13 +82,13 @@ sonar_analysis:
         echo "Running SonarQube analysis for $service...";
         cd $service;
 
-      mvn clean verify sonar:sonar \
-        -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-        -Dsonar.organization=${SONAR_ORG} \
-        -Dsonar.host.url=https://sonarcloud.io \
-        -Dsonar.token=${SONAR_TOKEN} \
-        -Dsonar.coverage.jacoco.xmlReportPaths="../$service/target/site/jacoco/jacoco.xml" \
-        -Dsonar.modules=$service;
+        mvn clean verify sonar:sonar \
+          -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+          -Dsonar.organization=${SONAR_ORG} \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.token=${SONAR_TOKEN} \
+          -Dsonar.coverage.jacoco.xmlReportPaths="../$service/target/site/jacoco/jacoco.xml" \
+          -Dsonar.modules=$service;
       
-      cd ..;
-    done
+        cd ..;
+      done;
