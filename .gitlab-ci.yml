@@ -59,8 +59,7 @@ test_services:
         echo "Testing $service..."
         mvn -DskipTests=false -f $service/pom.xml test jacoco:report
         Invoke-WebRequest -Uri https://codecov.io/bash -OutFile codecov.sh
-        chmod +x codecov.sh
-        ./codecov.sh -t $env:CODECOV_TOKEN
+        .\codecov.sh -t $env:CODECOV_TOKEN
       }
   artifacts:
     when: always
