@@ -4,7 +4,6 @@ stages:
   - quality
 
 variables:
-  MAVEN_CLI_OPTS: "-B -DskipTests=false"
   SONAR_ORG: "futind"
   SONAR_PROJECT_KEY: "futind_LoanIssuer"
 
@@ -39,7 +38,7 @@ build_services:
       $services = @("MS-Calculator", "MS-Deal", "MS-Statement", "MS-Dossier", "MS-Gateway")
       foreach ($service in $services) {
         echo "Building $service..."
-        mvn $MAVEN_CLI_OPTS -f $service/pom.xml clean package
+        mvn -DskipTests=true -f $service/pom.xml clean package
       }
   artifacts:
     paths:
@@ -58,7 +57,7 @@ test_services:
       $services = @("MS-Calculator", "MS-Deal", "MS-Statement", "MS-Dossier", "MS-Gateway")
       foreach ($service in $services) {
         echo "Testing $service..."
-        mvn $MAVEN_CLI_OPTS -f $service/pom.xml test jacoco:report
+        mvn -DskipTests=false -f $service/pom.xml test jacoco:report
         bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}
       }
   artifacts:
