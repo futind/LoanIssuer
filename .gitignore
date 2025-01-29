@@ -41,3 +41,5 @@ Documents/
 MS-Deal/.env.properties
 MS-Dossier/.env.properties
 .env
+builds/
+cache/
