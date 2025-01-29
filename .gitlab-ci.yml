@@ -35,10 +35,12 @@ build_services:
     - develop
     - merge_requests
   script:
-    - for service in MS-Calculator MS-Deal MS-Statement MS-Dossier MS-Gateway; do
-        echo "Building $service...";
-        mvn $MAVEN_CLI_OPTS -f $service/pom.xml clean package;
-      done
+    - |
+      $services = @("MS-Calculator", "MS-Deal", "MS-Statement", "MS-Dossier", "MS-Gateway")
+      foreach ($service in $services) {
+        echo "Building $service..."
+        mvn $MAVEN_CLI_OPTS -f $service/pom.xml clean package
+      }
   artifacts:
     paths:
       - MS-*/target/*.jar
@@ -52,11 +54,13 @@ test_services:
     - develop
     - merge_requests
   script:
-    - for service in MS-Calculator MS-Deal MS-Statement MS-Dossier MS-Gateway; do
-        echo "Testing $service...";
-        mvn $MAVEN_CLI_OPTS -f $service/pom.xml test jacoco:report;
-        bash < (curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN};
-      done
+    - |
+      $services = @("MS-Calculator", "MS-Deal", "MS-Statement", "MS-Dossier", "MS-Gateway")
+      foreach ($service in $services) {
+        echo "Testing $service..."
+        mvn $MAVEN_CLI_OPTS -f $service/pom.xml test jacoco:report
+        bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}
+      }
   artifacts:
     when: always
     paths:
