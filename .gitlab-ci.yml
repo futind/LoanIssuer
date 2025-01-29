@@ -59,7 +59,7 @@ test_services:
         pwd;
         cd $service/target/site/jacoco;
         ls -al;
-        bash <(curl -s https://codecov.io/bash) -t "${CODECOV_TOKEN}" -f "$service/target/site/jacoco/jacoco.xml" -F "$service" -R "futind/LoanIssuer";
+        bash <(curl -s https://codecov.io/bash) -t "${CODECOV_TOKEN}" -f "$service/target/site/jacoco/jacoco.xml" -F "$service" -R "$service/target/site/jacoco/";
       done
   artifacts:
     when: always
