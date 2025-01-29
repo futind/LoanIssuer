@@ -53,8 +53,8 @@ test_services:
   script:
     - for service in MS-Calculator MS-Deal MS-Statement MS-Dossier MS-Gateway; do
         echo "Testing $service...";
-        mvn $MAVEN_CLI_OPTS -f $service/pom.xml test jacoco:report;
-        bash < (curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN};
+        mvn -DskipTests=false -f $service/pom.xml test jacoco:report;
+        bash <(curl -s https://codecov.io/bash) -t "${CODECOV_TOKEN}" -f "$service/target/site/jacoco/jacoco.xml" -F "$service";
       done
   artifacts:
     when: always
@@ -73,14 +73,11 @@ sonar_analysis:
     - merge_requests
   stage: quality
   script:
-    - |
-      $services = @("MS-Calculator", "MS-Deal", "MS-Statement", "MS-Dossier", "MS-Gateway")
-      foreach ($service in $services) {
-        echo "Running Sonar analysis for $service..."
-        mvn clean verify sonar:sonar \
-          -Dsonar.projectKey=futind_LoanIssuer \
-          -Dsonar.organization=futind \
-          -Dsonar.host.url=https://sonarcloud.io \
-          -Dsonar.token=$env:SONAR_TOKEN \
-          -f $service/pom.xml
-      }
+    - set -x
+    - echo "Running Sonar analysis for $service...";
+    - mvn clean verify sonar:sonar \
+        -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+        -Dsonar.organization=${SONAR_ORG} \
+        -Dsonar.host.url=https://sonarcloud.io \
+        -Dsonar.token=${SONAR_TOKEN} \
+        -Dsonar.coverage.jacoco.xmlReportPaths="MS-Calculator/target/site/jacoco/jacoco.xml,MS-Deal/target/site/jacoco/jacoco.xml,MS-Statement/target/site/jacoco/jacoco.xml,MS-Dossier/target/site/jacoco/jacoco.xml,MS-Gateway/target/site/jacoco/jacoco.xml"
