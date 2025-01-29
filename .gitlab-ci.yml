@@ -56,6 +56,9 @@ test_services:
         mvn -DskipTests=false -f $service/pom.xml test jacoco:report > /dev/null 2>&1;
         echo $service;
         echo ${CODECOV_TOKEN};
+        pwd;
+        cd $service/target/site/jacoco;
+        ls -al;
         bash <(curl -s https://codecov.io/bash) -t "${CODECOV_TOKEN}" -f "$service/target/site/jacoco/jacoco.xml" -F "$service" -R "futind/LoanIssuer";
       done
   artifacts:
