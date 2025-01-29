@@ -44,8 +44,8 @@ cache:
 
 test_services:
   stage: test
-  needs:
-    - build_services
+  # needs:
+  #   - build_services
   only:
     - main
     - develop
