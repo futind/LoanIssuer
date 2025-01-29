@@ -54,6 +54,8 @@ test_services:
     - for service in MS-Calculator MS-Deal MS-Statement MS-Dossier MS-Gateway; do
         echo "Testing $service...";
         mvn -DskipTests=false -f $service/pom.xml test jacoco:report;
+        echo $service
+        echo ${CODECOV_TOKEN}
         bash <(curl -s https://codecov.io/bash) -t "${CODECOV_TOKEN}" -f "$service/target/site/jacoco/jacoco.xml" -F "$service";
       done
   artifacts:
