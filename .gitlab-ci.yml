@@ -1,0 +1,73 @@
+stages:
+  - build
+  - test
+  - quality
+
+variables:
+  MAVEN_CLI_OPTS: "-B -DskipTests=false"
+  SONAR_ORG: "futind"
+  SONAR_PROJECT_KEY: "futind_LoanIssuer"
+
+cache:
+  paths:
+    - .m2/repository/
+
+before_build:
+  stage: build
+  script:
+    - mvn install:install-file
+      -Dfile=".\Libs\LoanIssuerLibrary-0.0.1-SNAPSHOT.jar"
+      -DgroupId="ru.neoflex"
+      -DartifactId="loan-issuer-library"
+      -Dversion="0.0.1-SNAPSHOT"
+      -Dpackaging=jar
+
+build_services:
+  stage: build
+  needs:
+    - before_build
+  only:
+    - main
+    - develop
+    - merge_requests
+  script:
+    - for service in MS-Calculator MS-Deal MS-Statement MS-Dossier MS-Gateway; do
+        echo "Building $service...";
+        mvn $MAVEN_CLI_OPTS -f $service/pom.xml clean package;
+      done
+  artifacts:
+    paths:
+      - MS-*/target/*.jar
+
+test_services:
+  stage: test
+  only:
+    - main
+    - develop
+    - merge_requests
+  script:
+    - for service in MS-Calculator MS-Deal MS-Statement MS-Dossier MS-Gateway; do
+        echo "Testing $service...";
+        mvn $MAVEN_CLI_OPTS -f $service/pom.xml test jacoco:report;
+        bash < (curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN};
+      done
+  artifacts:
+    when: always
+    paths:
+      - MS-*/target/site/jacoco/
+    reports:
+      junit:
+        - MS-*/target/surefire-reports/TEST-*.xml
+
+sonar_analysis:
+  only:
+    - main
+    - develop
+    - merge_requests
+  stage: quality
+  script:
+    - mvn sonar:sonar
+      -Dsonar.projectKey=${SONAR_PROJECT_KEY}
+      -Dsonar.organization=${SONAR_ORG}
+      -Dsonar.host.url=${SONAR_HOST_URL}
+      -Dsonar.token=${SONAR_TOKEN}

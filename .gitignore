@@ -38,3 +38,6 @@ build/
 MS-Deal/src/main/resources/application-local.properties
 MS-Dossier/src/main/resources/application-local.properties
 Documents/
+MS-Deal/.env.properties
+MS-Dossier/.env.properties
+.env

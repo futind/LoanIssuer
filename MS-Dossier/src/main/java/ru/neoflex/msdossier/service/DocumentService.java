@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.neoflex.loanissuerlibrary.dto.DocumentDataDto;
 import ru.neoflex.loanissuerlibrary.dto.PaymentScheduleElementDto;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -23,13 +24,14 @@ public class DocumentService {
 
     public void createCreditDocument(UUID statementId, DocumentDataDto documentDataDto) {
         try {
-            Files.createDirectories(Paths.get(documentsPath + "\\" + statementId.toString()));
+            Files.createDirectories(Paths.get(documentsPath + File.separator + statementId.toString()));
         } catch (IOException e) {
             log.error("Could not create directory to store documents in: " + e.getMessage());
             e.printStackTrace();
         }
 
-        String filepath = documentsPath + "\\" + statementId.toString() + "\\credit_document.txt";
+        String filepath = documentsPath + File.separator +
+                          statementId.toString() + File.separator + "credit_document.txt";
 
         try(FileOutputStream fileOutputStream = new FileOutputStream(filepath)) {
 
@@ -82,12 +84,13 @@ public class DocumentService {
 
     public void createCreditScheduleDocument(UUID statementId, DocumentDataDto documentDataDto) {
         try {
-            Files.createDirectories(Paths.get(documentsPath + "\\" + statementId.toString()));
+            Files.createDirectories(Paths.get(documentsPath + File.separator + statementId.toString()));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        String filepath = documentsPath + "\\" + statementId.toString() + "\\credit_schedule.txt";
+        String filepath = documentsPath + File.separator +
+                          statementId.toString() + File.separator + "credit_schedule.txt";
 
         try(FileOutputStream fileOutputStream = new FileOutputStream(filepath)) {
 
