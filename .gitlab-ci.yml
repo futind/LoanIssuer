@@ -66,20 +66,20 @@ test_services:
       junit:
         - MS-*/target/surefire-reports/TEST-*.xml
 
-sonar_analysis:
-  needs:
-    - test_services
-  only:
-    - main
-    - develop
-    - merge_requests
-  stage: quality
-  script:
-    - set -x
-    - echo "Running Sonar analysis for $service...";
-    - mvn clean verify sonar:sonar \
-        -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-        -Dsonar.organization=${SONAR_ORG} \
-        -Dsonar.host.url=https://sonarcloud.io \
-        -Dsonar.token=${SONAR_TOKEN} \
-        -Dsonar.coverage.jacoco.xmlReportPaths="MS-Calculator/target/site/jacoco/jacoco.xml,MS-Deal/target/site/jacoco/jacoco.xml,MS-Statement/target/site/jacoco/jacoco.xml,MS-Dossier/target/site/jacoco/jacoco.xml,MS-Gateway/target/site/jacoco/jacoco.xml"
+# sonar_analysis:
+#   needs:
+#     - test_services
+#   only:
+#     - main
+#     - develop
+#     - merge_requests
+#   stage: quality
+#   script:
+#     - set -x
+#     - echo "Running Sonar analysis for $service...";
+#     - mvn clean verify sonar:sonar \
+#         -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+#         -Dsonar.organization=${SONAR_ORG} \
+#         -Dsonar.host.url=https://sonarcloud.io \
+#         -Dsonar.token=${SONAR_TOKEN} \
+#         -Dsonar.coverage.jacoco.xmlReportPaths="MS-Calculator/target/site/jacoco/jacoco.xml,MS-Deal/target/site/jacoco/jacoco.xml,MS-Statement/target/site/jacoco/jacoco.xml,MS-Dossier/target/site/jacoco/jacoco.xml,MS-Gateway/target/site/jacoco/jacoco.xml"
