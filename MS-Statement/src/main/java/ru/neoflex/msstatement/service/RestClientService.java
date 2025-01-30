@@ -1,6 +1,7 @@
 package ru.neoflex.msstatement.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -16,12 +17,15 @@ import java.util.List;
 public class RestClientService {
 
     private final RestClient restClient;
-    private final String baseUri = "http://localhost:8081";
+    private final String baseUri;
     private final String statementUri = "/deal/statement";
     private final String offerSelectUri = "/deal/offer/select";
 
-    public RestClientService(RestClient restClient) {
+    public RestClientService(RestClient restClient,
+                             @Value("${msdeal.host}") String dealHost,
+                             @Value("${msdeal.port}") String dealPort) {
         this.restClient = restClient;
+        this.baseUri = "http://" + dealHost + ":" + dealPort;
     }
 
     public List<LoanOfferDto> getOffers(LoanStatementRequestDto request)

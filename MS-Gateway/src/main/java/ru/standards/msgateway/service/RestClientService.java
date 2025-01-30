@@ -19,56 +19,55 @@ import java.util.UUID;
 @Slf4j
 public class RestClientService {
 
-    private RestClient restClient;
+    private final RestClient restClient;
 
-    private String URI_BASE;
+    private final String DEAL_URI_BASE;
+    private final String STATEMENT_URI_BASE;
 
-    private String STATEMENT_PORT;
-    private String DEAL_PORT;
+    private final String STATEMENT_PORT;
+    private final String DEAL_PORT;
 
-    private String URI_STATEMENT;
-    private String URI_STATEMENT_OFFER;
-    private String URI_DEAL_CALCULATE;
-    private String URI_DEAL_DOCUMENT_SEND_BASE;
-    private String URI_DEAL_DOCUMENT_SEND_END;
-    private String URI_DEAL_DOCUMENT_SIGN_BASE;
-    private String URI_DEAL_DOCUMENT_SIGN_END;
-    private String URI_DEAL_DOCUMENT_CODE_BASE;
-    private String URI_DEAL_DOCUMENT_CODE_END;
+    private final String URI_STATEMENT;
+    private final String URI_STATEMENT_OFFER;
+    private final String URI_DEAL_CALCULATE;
+    private final String URI_DEAL_DOCUMENT_BASE;
+    private final String URI_DEAL_DOCUMENT_SEND;
+    private final String URI_DEAL_DOCUMENT_SIGN;
+    private final String URI_DEAL_DOCUMENT_CODE;
 
     public RestClientService(RestClient restClient,
-                             @Value("${uri.base}") String uriBase,
+                             @Value("${uri.base.deal}") String dealUriBase,
+                             @Value("${uri.base.statement}") String statementUriBase,
                              @Value("${port.statement}") String statementPort,
                              @Value("${port.deal}") String dealPort,
                              @Value("${uri.statement}") String uriStatement,
                              @Value("${uri.statement.offer}") String uriStatementOffer,
                              @Value("${uri.deal.calculate}") String uriDealCalculate,
-                             @Value("${uri.deal.document.send.base}") String uriDealDocumentSendBase,
-                             @Value("${uri.deal.document.send.end}") String uriDealDocumentSendEnd,
-                             @Value("${uri.deal.document.sign.base}") String uriDealDocumentSignBase,
-                             @Value("${uri.deal.document.sign.end}") String uriDealDocumentSignEnd,
-                             @Value("${uri.deal.document.code.base}") String uriDealDocumentCodeBase,
-                             @Value("${uri.deal.document.code.end}") String uriDealDocumentCodeEnd) {
+                             @Value("${uri.deal.document.base}") String uriDealDocumentBase,
+                             @Value("${uri.deal.document.send}") String uriDealDocumentSend,
+                             @Value("${uri.deal.document.sign}") String uriDealDocumentSign,
+                             @Value("${uri.deal.document.code}") String uriDealDocumentCode) {
         this.restClient = restClient;
-        URI_BASE = uriBase;
-        STATEMENT_PORT = statementPort;
+        DEAL_URI_BASE = "http://" + dealUriBase + ":";
         DEAL_PORT = dealPort;
+
+        STATEMENT_URI_BASE = "http://" + statementUriBase + ":";
+        STATEMENT_PORT = statementPort;
+
         URI_STATEMENT = uriStatement;
         URI_STATEMENT_OFFER = uriStatementOffer;
         URI_DEAL_CALCULATE = uriDealCalculate;
-        URI_DEAL_DOCUMENT_SEND_BASE = uriDealDocumentSendBase;
-        URI_DEAL_DOCUMENT_SEND_END = uriDealDocumentSendEnd;
-        URI_DEAL_DOCUMENT_SIGN_BASE = uriDealDocumentSignBase;
-        URI_DEAL_DOCUMENT_SIGN_END = uriDealDocumentSignEnd;
-        URI_DEAL_DOCUMENT_CODE_BASE = uriDealDocumentCodeBase;
-        URI_DEAL_DOCUMENT_CODE_END = uriDealDocumentCodeEnd;
+        URI_DEAL_DOCUMENT_BASE = uriDealDocumentBase;
+        URI_DEAL_DOCUMENT_SEND = uriDealDocumentSend;
+        URI_DEAL_DOCUMENT_SIGN = uriDealDocumentSign;
+        URI_DEAL_DOCUMENT_CODE = uriDealDocumentCode;
     }
 
     public List<LoanOfferDto> createStatementGetOffers(LoanStatementRequestDto request) {
 
-        log.info("Making a request to {}...", URI_BASE + STATEMENT_PORT + URI_STATEMENT);
+        log.info("Making a request to {}...", STATEMENT_URI_BASE + STATEMENT_PORT + URI_STATEMENT);
         return restClient.post()
-                .uri(URI_BASE + STATEMENT_PORT + URI_STATEMENT)
+                .uri(STATEMENT_URI_BASE + STATEMENT_PORT + URI_STATEMENT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()
@@ -77,10 +76,10 @@ public class RestClientService {
     }
 
     public void selectStatement(LoanOfferDto offer) {
-        log.info("Making a request to {}...", URI_BASE + STATEMENT_PORT + URI_STATEMENT_OFFER);
+        log.info("Making a request to {}...", STATEMENT_URI_BASE + STATEMENT_PORT + URI_STATEMENT_OFFER);
 
         restClient.post()
-                .uri(URI_BASE + STATEMENT_PORT + URI_STATEMENT_OFFER)
+                .uri(STATEMENT_URI_BASE + STATEMENT_PORT + URI_STATEMENT_OFFER)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(offer)
                 .retrieve()
@@ -88,10 +87,10 @@ public class RestClientService {
     }
 
     public void finishRegistration(UUID statementId, FinishRegistrationRequestDto request) {
-        log.info("Making a request to {}...", URI_BASE + URI_DEAL_CALCULATE + "{statementId}");
+        log.info("Making a request to {}...", DEAL_URI_BASE + DEAL_PORT + URI_DEAL_CALCULATE + "{statementId}");
 
         restClient.post()
-                .uri(URI_BASE + DEAL_PORT + URI_DEAL_CALCULATE + "/" + statementId.toString())
+                .uri(DEAL_URI_BASE + DEAL_PORT + URI_DEAL_CALCULATE + "/" + statementId.toString())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()
@@ -99,36 +98,36 @@ public class RestClientService {
     }
 
     public void sendDocuments(UUID statementId) {
-        log.info("Making a request to {}...", URI_BASE + DEAL_PORT + URI_DEAL_DOCUMENT_SEND_BASE
-                                                       + "{statementId}" + URI_DEAL_DOCUMENT_SEND_END);
+        log.info("Making a request to {}...", DEAL_URI_BASE + DEAL_PORT + URI_DEAL_DOCUMENT_BASE
+                                                       + "{statementId}" + URI_DEAL_DOCUMENT_SEND);
 
         restClient.post()
-                .uri(URI_BASE + DEAL_PORT + URI_DEAL_DOCUMENT_SEND_BASE
-                        + "/" + statementId.toString() + URI_DEAL_DOCUMENT_SEND_END)
+                .uri(DEAL_URI_BASE + DEAL_PORT + URI_DEAL_DOCUMENT_BASE
+                        + "/" + statementId.toString() + URI_DEAL_DOCUMENT_SEND)
                 .retrieve()
                 .toBodilessEntity();
     }
 
     public void signDocuments(UUID statementId) {
-        log.info("Making a request to {}...", URI_BASE + DEAL_PORT + URI_DEAL_DOCUMENT_SIGN_BASE
-                                                       + "{statementId}" + URI_DEAL_DOCUMENT_SIGN_END);
+        log.info("Making a request to {}...", DEAL_URI_BASE + DEAL_PORT + URI_DEAL_DOCUMENT_BASE
+                                                       + "{statementId}" + URI_DEAL_DOCUMENT_SIGN);
 
         restClient.post()
-                .uri(URI_BASE + DEAL_PORT + URI_DEAL_DOCUMENT_SIGN_BASE
-                        + "/" + statementId.toString() + URI_DEAL_DOCUMENT_SIGN_END)
+                .uri(DEAL_URI_BASE + DEAL_PORT + URI_DEAL_DOCUMENT_BASE
+                        + "/" + statementId.toString() + URI_DEAL_DOCUMENT_SIGN)
                 .retrieve()
                 .toBodilessEntity();
     }
 
     public void verifyCode(UUID statementId, String code) {
-        log.info("Making a request to {}...", URI_BASE + DEAL_PORT + URI_DEAL_DOCUMENT_CODE_BASE
-                                                       + "{statementId}" + URI_DEAL_DOCUMENT_CODE_END);
+        log.info("Making a request to {}...", DEAL_URI_BASE + DEAL_PORT + URI_DEAL_DOCUMENT_BASE
+                                                       + "{statementId}" + URI_DEAL_DOCUMENT_CODE);
 
         String uri = UriComponentsBuilder
-                .fromUriString(URI_BASE + DEAL_PORT)
-                .path(URI_DEAL_DOCUMENT_CODE_BASE)
+                .fromUriString(DEAL_URI_BASE + DEAL_PORT)
+                .path(URI_DEAL_DOCUMENT_BASE)
                 .path("/" + statementId.toString())
-                .path(URI_DEAL_DOCUMENT_CODE_END)
+                .path(URI_DEAL_DOCUMENT_CODE)
                 .queryParam("code", code)
                 .build()
                 .toUriString();

@@ -2,6 +2,7 @@ package ru.neoflex.msdossier.service;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
@@ -14,12 +15,15 @@ import java.util.UUID;
 public class RestClientService {
 
     private final RestClient restClient;
-    private final String baseUri = "http://localhost:8081";
+    private final String baseUri;
     private final String adminUri = "/deal/admin/statement";
     private final String documentUri = "/deal/document";
 
-    public RestClientService(RestClient restClient) {
+    public RestClientService(RestClient restClient,
+                             @Value("${msdeal.host}") String dealHost,
+                             @Value("${msdeal.port}") String dealPort) {
         this.restClient = restClient;
+        this.baseUri = "http://" + dealHost + ":" + dealPort;
     }
 
     public void putDocumentsCreatedStatus(UUID statementId) throws RestClientResponseException {
