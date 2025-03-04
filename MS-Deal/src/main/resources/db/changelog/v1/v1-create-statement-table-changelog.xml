@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro
+        http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+        <changeSet id="v1-3" author="Daniil Futin">
+            <preConditions onFail="MARK_RAN">
+                <not>
+                    <tableExists tableName="credit_statement"/>
+                </not>
+            </preConditions>
+            <createTable tableName="credit_statement">
+                <column name="statement_id" type="uuid">
+                    <constraints primaryKey="true"/>
+                </column>
+                <column name="client_id" type="uuid">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="credit_id" type="uuid">
+                    <constraints nullable="true"/>
+                </column>
+                <column name="status" type="varchar(255)">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="creation_date" type="timestamp">
+                    <constraints nullable="false"/>
+                </column>
+                <column name="applied_offer" type="jsonb">
+                    <constraints nullable="true"/>
+                </column>
+                <column name="sign_date" type="timestamp">
+                    <constraints nullable="true"/>
+                </column>
+                <column name="ses_code" type="varchar(255)">
+                    <constraints nullable="true"/>
+                </column>
+                <column name="status_history" type="jsonb">
+                    <constraints nullable="false"/>
+                </column>
+            </createTable>
+
+            <addForeignKeyConstraint baseTableName="credit_statement"
+                                     baseColumnNames="client_id"
+                                     referencedTableName="client"
+                                     referencedColumnNames="client_id"
+                                     constraintName="fk_statement_client"/>
+
+            <addForeignKeyConstraint baseTableName="credit_statement"
+                                     baseColumnNames="credit_id"
+                                     constraintName="fk_statement_credit"
+                                     referencedTableName="credit"
+                                     referencedColumnNames="credit_id"/>
+        </changeSet>
+
+</databaseChangeLog>
