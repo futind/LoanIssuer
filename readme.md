@@ -1,7 +1,7 @@
 
 
 # Кредитный конвейер
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=futind_LoanIssuer&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=futind_LoanIssuer) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=futind_LoanIssuer&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=futind_LoanIssuer) [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=futind_LoanIssuer&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=futind_LoanIssuer) [![codecov](https://codecov.io/gl/futind/LoanIssuer/graph/badge.svg?token=50GSM7IGIY)](https://codecov.io/gl/futind/LoanIssuer)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=futind_LoanIssuer&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=futind_LoanIssuer) [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=futind_LoanIssuer&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=futind_LoanIssuer) [![codecov](https://codecov.io/gl/futind/LoanIssuer/graph/badge.svg?token=50GSM7IGIY)](https://codecov.io/gl/futind/LoanIssuer)
 ## Описание проекта
 
 Курсовой проект для компании **Neoflex**: бэкенд-приложение с микросервисной архитектурой — прототип кредитного конвейера.
